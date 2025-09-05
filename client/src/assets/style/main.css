@@ -16,3 +16,7 @@
   /* text */
   --color-text-dark: #0c0c0c;
 }
+
+body {
+  font-family: "Poppins";
+}
