@@ -1,11 +1,12 @@
 import LogoImage from "@/assets/images/logo.png";
 
 // navbar links
-import { navlinks } from "@/data/home";
+import { navlinks } from "@/data/home.tsx";
 import { Link } from "react-router-dom";
 
 // types
-import type { Navlink } from "@/data/home";
+import type { Navlink } from "@/data/home.types";
+import { User, UserCircle } from "lucide-react";
 
 const HeroHeader = () => {
   return (
@@ -21,8 +22,7 @@ const HeroHeader = () => {
         {/* title */}
         <h1 className="text-white/70 text-2xl font-semibold">CVisionary</h1>
       </Link>
-
-      <div className="flex items-center justify-end gap-8">
+      <div className="flex items-center justify-end gap-16">
         {/* navbar */}
         <nav className="flex flex-center gap-8">
           {navlinks.map((link: Navlink) => (
@@ -35,7 +35,7 @@ const HeroHeader = () => {
         </nav>
 
         {/* profile */}
-        <span></span>
+        <UserCircle className="text-white/60 cursor-pointer" />
       </div>
     </header>
   );
