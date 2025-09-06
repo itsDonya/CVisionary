@@ -57,19 +57,19 @@ export const propertiesSection: homeTypes.PropertiesSection = {
       icon: Zap,
       title: "AI-Powered Resume Builder",
       description:
-        "Create professional resumes with intelligent AI assistance and automated formatting.",
+        "Effortlessly turn your career history into a professional CV with intelligent auto-complete, smart templates, and instant formatting.",
     },
     {
       icon: Sparkles,
-      title: "Smart Content Generator",
+      title: "Smart Suggestions & Personalization",
       description:
-        "Automatic suggestions and the best keywords to target for your industry.",
+        "Get adaptive content recommendations—AI analyzes your background and suggests skills, achievements, and keyword optimizations tailored for your dream job.",
     },
     {
       icon: Target,
-      title: "ATS Optimization",
+      title: "Career Insights & Goal Tracking",
       description:
-        "Helps you get past ATS systems with guided assistance and best practices.",
+        "Track your job applications, see how your resume compares to others, and get actionable feedback to boost your visibility—powered by real labor market data.",
     },
   ],
 };

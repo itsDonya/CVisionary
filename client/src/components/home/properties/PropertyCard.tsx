@@ -15,7 +15,7 @@ const PropertyCard = ({ icon: Icon, title, description }: PropertyItem) => {
         <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-purple-100 transition-colors duration-300">
           {title}
         </h3>
-        <p className="text-neutral-400 leading-relaxed group-hover:text-neutral-300 transition-colors duration-300">
+        <p className="text-neutral-300/80 leading-relaxed group-hover:text-neutral-300 transition-colors duration-300">
           {description}
         </p>
       </div>
