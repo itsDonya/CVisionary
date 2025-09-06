@@ -2,7 +2,7 @@ import type { Property } from "@/data/home.types";
 
 const HeroProperties = ({ properties }: { properties: Property[] }) => {
   return (
-    <ul className="mt-8 flex items-center justify-center gap-4">
+    <ul className="flex items-center justify-center gap-4">
       {properties.map((prop) => (
         <li
           key={prop.title}
