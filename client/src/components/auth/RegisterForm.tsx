@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const RegisterForm = () => {
+  // states
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -9,6 +10,7 @@ const RegisterForm = () => {
     confirmPassword: "",
   });
 
+  // functions
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
@@ -24,7 +26,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md bg-black/30 backdrop-blur-md rounded-lg border border-white/20 p-8 shadow-2xl">
+    <section className="w-full max-w-md bg-black/30 backdrop-blur-md rounded-lg border border-white/20 p-8 shadow-2xl">
       <h1 className="text-white text-3xl font-medium text-center mb-8">
         Register
       </h1>
@@ -93,7 +95,7 @@ const RegisterForm = () => {
           Login
         </Link>
       </p>
-    </div>
+    </section>
   );
 };
 

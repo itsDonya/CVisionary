@@ -1,9 +1,9 @@
 import PropertyCard from "./PropertyCard";
 import { propertiesSection } from "@/data/home";
 
-const Features = () => {
+const Properties = () => {
   return (
-    <section className="w-full bg-[url('https://framerusercontent.com/images/J9PD0z8SzMHT2KxXQClbD5Q7PU.png')] py-20 flex flex-col items-center justify-center">
+    <section className="w-full bg-[url('https://framerusercontent.com/images/J9PD0z8SzMHT2KxXQClbD5Q7PU.png')] flex flex-col items-center justify-center">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 whitespace-pre-line">
           {propertiesSection.title}
@@ -22,4 +22,4 @@ const Features = () => {
   );
 };
 
-export default Features;
+export default Properties;

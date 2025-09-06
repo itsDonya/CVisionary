@@ -32,3 +32,16 @@ export type PropertiesSection = {
   description: string;
   items: PropertyItem[];
 };
+
+// ----
+
+export type FeatureItem = {
+  title: string;
+  description: string;
+  icon: any;
+};
+
+export type FeaturesSection = {
+  title: string;
+  items: FeatureItem[];
+};
