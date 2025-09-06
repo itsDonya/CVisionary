@@ -1,20 +1,34 @@
-import type { ReactElement } from "react";
-
 export type Navlink = {
   name: string;
   title: string;
   path: string;
 };
 
-export type Property = {
+// ----
+
+export type HeroPropertyItem = {
   title: string;
-  icon: ReactElement;
+  icon: React.ElementType;
 };
 
-export type HeroContent = {
+export type HeroSection = {
   title: string;
   tagline: string;
   description: string;
   buttonText: string;
-  properties: Property[];
+  properties: HeroPropertyItem[];
+};
+
+// ----
+
+export type PropertyItem = {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+};
+
+export type PropertiesSection = {
+  title: string;
+  description: string;
+  items: PropertyItem[];
 };

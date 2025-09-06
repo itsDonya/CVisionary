@@ -1,12 +1,12 @@
 import LogoImage from "@/assets/images/logo.png";
 
 // navbar links
-import { navlinks } from "@/data/home.tsx";
+import { navlinks } from "@/data/home";
 import { Link } from "react-router-dom";
 
 // types
 import type { Navlink } from "@/data/home.types";
-import { User, UserCircle } from "lucide-react";
+import { UserCircle } from "lucide-react";
 
 const HeroHeader = () => {
   return (
