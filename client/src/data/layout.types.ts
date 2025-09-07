@@ -1,3 +1,15 @@
+export type HeaderLinkItem = {
+  title: string;
+  path: string;
+};
+
+export type Header = {
+  title: string;
+  links: HeaderLinkItem[];
+};
+
+// ----
+
 export type FooterNavlinkItem = {
   title: string;
   to: string;

@@ -1,5 +1,23 @@
 import { Mail, MessageSquare } from "lucide-react";
-import type { Footer } from "./layout.types";
+import type { Header, Footer } from "./layout.types";
+
+export const header: Header = {
+  title: "CVisionary",
+  links: [
+    {
+      title: "Home",
+      path: "/",
+    },
+    {
+      title: "About",
+      path: "/about-us",
+    },
+    {
+      title: "Contact",
+      path: "/contact-us",
+    },
+  ],
+};
 
 export const footer: Footer = {
   title: "CVisionary",
