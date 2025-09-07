@@ -13,13 +13,18 @@ const Footer = () => {
 
       {/* content */}
       <div className="w-full h-full px-6 grid grid-cols-3 items-center justify-center">
-        {/* logo & title */}
-        <Link to="/" className="w-max flex items-center justify-start gap-3">
-          <Logo className="size-7 drop-shadow-md drop-shadow-black/40" />
+        {/* left side */}
+        <div className="w-max flex flex-col items-start justify-center gap-2s">
+          {/* title */}
           <h5 className="text-lg text-neutral-300 font-[300]">
             <strong>CVisionary</strong>
           </h5>
-        </Link>
+
+          {/* copyright text */}
+          <p className="text-[11px] text-neutral-300 font-[200]">
+            {footer.copyright}
+          </p>
+        </div>
 
         {/* navlink */}
         <nav className="w-full flex flex-center gap-6">
