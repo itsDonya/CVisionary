@@ -3,12 +3,14 @@ import { propertiesSection } from "@/data/home";
 
 const Properties = () => {
   return (
-    <section className="w-full py-20 bg-[url('https://framerusercontent.com/images/J9PD0z8SzMHT2KxXQClbD5Q7PU.png')] flex flex-col items-center justify-center">
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 whitespace-pre-line">
+    <section
+      id="home-properties-section"
+      className="w-full py-20 bg-[url('https://framerusercontent.com/images/J9PD0z8SzMHT2KxXQClbD5Q7PU.png')] flex flex-col items-center justify-center">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 whitespace-pre-line">
           {propertiesSection.title}
         </h2>
-        <p className="text-lg text-neutral-300/80 max-w-md mx-auto whitespace-pre-line">
+        <p className="text-lg text-neutral-200/80 font-[300] max-w-md mx-auto whitespace-pre-line">
           {propertiesSection.description}
         </p>
       </div>
