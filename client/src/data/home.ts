@@ -25,12 +25,12 @@ export const navlinks: homeTypes.Navlink[] = [
   {
     name: "about",
     title: "About",
-    path: "/about",
+    path: "/about-us",
   },
   {
     name: "contact",
     title: "Contact",
-    path: "/contact",
+    path: "/contact-us",
   },
 ];
 
