@@ -38,7 +38,7 @@ export type PropertiesSection = {
 export type FeatureItem = {
   title: string;
   description: string;
-  icon: any;
+  icon: React.ElementType;
 };
 
 export type FeaturesSection = {

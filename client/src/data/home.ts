@@ -6,6 +6,14 @@ import {
   Zap,
   Sparkles,
   Target,
+  TrendingUp,
+  MousePointerClick,
+  Palette,
+  CircleCheckBig,
+  Loader,
+  WandSparkles,
+  Trophy,
+  ChartColumnIncreasing,
 } from "lucide-react";
 
 export const navlinks: homeTypes.Navlink[] = [
@@ -81,55 +89,55 @@ export const featuresSection: homeTypes.FeaturesSection = {
       title: "AI-powered resume editor",
       description:
         "Effortlessly build and refine your resume with real-time, intelligent content suggestions.",
-      icon: "🤖",
+      icon: Sparkles,
     },
     {
       title: "Instant ATS optimization",
       description:
         "Automatically tailor your CV to beat Applicant Tracking Systems and attract recruiters.",
-      icon: "⚡",
+      icon: TrendingUp,
     },
     {
       title: "Dynamic templates",
       description:
         "Choose from modern, professionally designed templates that adapt to your career path.",
-      icon: "📄",
+      icon: Palette,
     },
     {
       title: "Personalized content assistant",
       description:
         "Get unique, AI-generated phrasing and achievements based on your background and industry.",
-      icon: "✨",
+      icon: WandSparkles,
     },
     {
       title: "Smart job targeting",
       description:
         "Receive the best-fit keywords and skills for your desired roles, powered by labor market data.",
-      icon: "🎯",
+      icon: CircleCheckBig,
     },
     {
       title: "One-click export",
       description:
         "Download a perfectly formatted PDF or ready-to-share link with just one click.",
-      icon: "📥",
+      icon: MousePointerClick,
     },
     {
       title: "Performance insights",
       description:
         "Receive actionable analytics about your resume's strengths, weaknesses, and real-world visibility.",
-      icon: "📊",
+      icon: ChartColumnIncreasing,
     },
     {
       title: "Career progress tracker",
       description:
         "Set your job search goals and track applications and networking—all in one place.",
-      icon: "📈",
+      icon: Loader,
     },
     {
       title: "Competitive benchmarking",
       description:
         "See how your CV stacks up against other candidates in your field, with actionable tips for improvement.",
-      icon: "🏆",
+      icon: Trophy,
     },
   ],
 };
