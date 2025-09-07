@@ -1,5 +1,3 @@
-import LogoImage from "@/assets/images/logo.png";
-
 // navbar links
 import { navlinks } from "@/data/home";
 import { Link } from "react-router-dom";
@@ -7,14 +5,14 @@ import { Link } from "react-router-dom";
 // types
 import type { Navlink } from "@/data/home.types";
 import { UserCircle } from "lucide-react";
+import Logo from "@/components/UI/Logo";
 
 const HeroHeader = () => {
   return (
     <header className="w-full pb-4 flex items-center justify-between gap-6 border-b-[1px] border-b-neutral-100/20">
       {/* logo */}
       <Link to="/" className="flex items-end justify-start gap-4">
-        <img
-          src={LogoImage}
+        <Logo
           className="size-10 drop-shadow-md drop-shadow-black/40"
           alt="CVisionary - AI-powered Resume Builder"
         />

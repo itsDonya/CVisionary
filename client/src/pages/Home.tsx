@@ -7,7 +7,7 @@ import DefaultLayout from "@/layouts/Default";
 const Home = () => {
   return (
     <DefaultLayout>
-      <article className="flex flex-col items-center justify-start gap-28">
+      <article className="pb-20 flex flex-col items-center justify-start gap-28">
         <Hero />
         <Properties />
         <Features />
