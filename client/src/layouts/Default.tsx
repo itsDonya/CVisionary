@@ -10,7 +10,7 @@ interface PropTypes {
 const DefaultLayout = ({ children, hasHeader = true }: PropTypes) => {
   return (
     <>
-      <div className="w-full bg-[url('/src/assets/images/landing-bg.jpg')] bg-cover bg-center bg-fixed flex flex-col items-center justify-start gap-20">
+      <div className="w-full bg-[url('/src/assets/images/landing-bg.jpg')] bg-cover bg-center bg-fixed flex flex-col items-center justify-start gap-10">
         {hasHeader && <Header />}
         <main className="w-full">{children}</main>
         <Footer />
