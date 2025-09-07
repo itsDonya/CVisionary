@@ -1,11 +1,6 @@
-export type FooterSection = {
+export type FooterNavlinkItem = {
   title: string;
-  links: FooterSectionItem[];
-};
-
-export type FooterSectionItem = {
-  title: string;
-  href: string;
+  to: string;
 };
 
 export type FooterContactItem = {
@@ -18,12 +13,9 @@ export type Footer = {
   title: string;
   description: string;
 
-  sections: FooterSection[];
+  navLinks: FooterNavlinkItem[];
 
-  contact: {
-    title: string;
-    items: FooterContactItem[];
-  };
+  contactLinks: FooterContactItem[];
 
   copyright: string;
 };
