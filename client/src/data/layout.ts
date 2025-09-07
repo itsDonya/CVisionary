@@ -12,10 +12,10 @@ export const header: Header = {
       title: "About",
       path: "/about-us",
     },
-    {
-      title: "Contact",
-      path: "/contact-us",
-    },
+    // {
+    //   title: "Contact",
+    //   path: "/contact-us",
+    // },
   ],
 };
 

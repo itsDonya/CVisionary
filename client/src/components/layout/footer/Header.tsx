@@ -16,12 +16,12 @@ const Header = () => {
         <h1 className="text-white/70 text-xl font-[500]">CVisionary</h1>
       </Link>
 
-      <nav className="flex items-center justify-end gap-8">
+      <nav className="flex items-center justify-end gap-6">
         {header.links.map((item: HeaderLinkItem) => (
           <Link
             to={item.path}
             key={item.title}
-            className="text-neutral-400 hover:text-neutral-300 transition-colors duration-300 transition-200">
+            className="text-sm text-neutral-400 hover:text-neutral-300 transition-colors duration-300 transition-200">
             <span>{item.title}</span>
           </Link>
         ))}

@@ -27,11 +27,11 @@ export const navlinks: homeTypes.Navlink[] = [
     title: "About",
     path: "/about-us",
   },
-  {
-    name: "contact",
-    title: "Contact",
-    path: "/contact-us",
-  },
+  // {
+  //   name: "contact",
+  //   title: "Contact",
+  //   path: "/contact-us",
+  // },
 ];
 
 export const heroSection: homeTypes.HeroSection = {
