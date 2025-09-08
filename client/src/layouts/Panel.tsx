@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 // components
 import Sidebar from "@/components/layout/user/Sidebar";
 
-const SIDEBAR_WIDTH = 256;
+// const SIDEBAR_WIDTH = 256;
 
 const PanelLayout = () => {
   return (
