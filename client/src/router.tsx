@@ -1,12 +1,17 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
+// layouts
+import PanelLayout from "./layouts/Panel";
+
 // components
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AboutUs from "./pages/About";
-import PanelLayout from "./layouts/Panel";
+
+// panel
 import Dashboard from "./pages/user/Dashboard";
+import ResumeBuilder from "./pages/user/ResumeBuilder";
 
 export const router = createBrowserRouter([
   {
@@ -40,7 +45,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "resume/create",
-        element: <p>Resume Create Page</p>,
+        element: <ResumeBuilder />,
+      },
+      {
+        path: "resume/:id",
+        element: <ResumeBuilder />,
       },
     ],
   },
