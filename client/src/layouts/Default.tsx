@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import Footer from "@/components/layout/footer/Footer";
-import Header from "@/components/layout/footer/Header";
+import Footer from "@/components/layout/general/Footer";
+import Header from "@/components/layout/general/Header";
 
 interface PropTypes {
   children: ReactNode;
