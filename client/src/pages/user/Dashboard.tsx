@@ -82,7 +82,7 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid component="div">
           <Paper
             sx={{
               p: 3,
@@ -131,7 +131,7 @@ const Dashboard = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid>
           <Paper
             sx={{
               p: 3,
@@ -180,7 +180,7 @@ const Dashboard = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid component="div">
           <Paper
             sx={{
               p: 3,
