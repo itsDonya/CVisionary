@@ -1,3 +1,4 @@
+// src/components/layout/Sidebar.tsx
 import {
   Box,
   Drawer,
@@ -11,29 +12,27 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Add, Menu } from "@mui/icons-material";
+import { Plus, Menu, FileText, Gauge } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 import { Link, useLocation } from "react-router-dom";
 import type { SidebarItem } from "@/types/user";
-import { Gauge } from "lucide-react";
-import Logo from "@/components/UI/Logo";
 
 const sidebarItems: SidebarItem[] = [
   {
     id: "dashboard",
     label: "Dashboard",
     path: "/panel",
-    icon: <Gauge />,
+    icon: <Gauge size={18} />,
   },
   {
     id: "create-resume",
     label: "Create Resume",
     path: "/panel/resume/create",
-    icon: <Add />,
+    icon: <Plus size={18} />,
   },
 ];
 
-const SIDEBAR_WIDTH = 256;
+const SIDEBAR_WIDTH = 280;
 
 const Sidebar = () => {
   const theme = useTheme();
@@ -42,16 +41,17 @@ const Sidebar = () => {
   const location = useLocation();
 
   const SidebarContent = () => (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 3 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        p: 3,
+        height: "100%",
+      }}>
       {/* Logo/Brand */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 1,
-        }}>
-        <p className="text-2xl font-bold bg-gradient-to-r from-primary-800 to-primary-400 bg-clip-text text-transparent">
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, px: 1 }}>
+        <p className="text-2xl bg-gradient-to-r from-primary-800 via-primary-600 to-primary-500 bg-clip-text text-transparent font-bold">
           CVisionary
         </p>
       </Box>
@@ -59,32 +59,46 @@ const Sidebar = () => {
       {/* Navigation */}
       <List sx={{ p: 0 }}>
         {sidebarItems.map((item) => (
-          <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
+          <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
             <ListItemButton
               component={Link}
               to={item.path}
               selected={location.pathname === item.path}
               sx={{
-                borderRadius: 1.5,
+                borderRadius: 3,
+                px: 2,
+                py: 1.5,
                 color: "text.secondary",
-
+                background:
+                  location.pathname === item.path
+                    ? "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)"
+                    : "transparent",
+                border:
+                  location.pathname === item.path
+                    ? "1px solid rgba(139, 92, 246, 0.2)"
+                    : "1px solid transparent",
+                "&:hover": {
+                  background: "rgba(139, 92, 246, 0.08)",
+                  border: "1px solid rgba(139, 92, 246, 0.1)",
+                  color: "text.primary",
+                },
                 "&.Mui-selected": {
-                  backgroundColor: "rgba(139, 92, 246, 0.12)",
                   color: "primary.main",
+                  fontWeight: 600,
                 },
               }}>
               <ListItemIcon
                 sx={{
                   color: "inherit",
-                  minWidth: 40,
+                  minWidth: 36,
                 }}>
                 {item.icon}
               </ListItemIcon>
               <ListItemText
                 primary={item.label}
                 primaryTypographyProps={{
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
+                  fontSize: "0.9rem",
+                  fontWeight: "inherit",
                 }}
               />
             </ListItemButton>
@@ -102,16 +116,17 @@ const Sidebar = () => {
           onClick={toggleSidebar}
           sx={{
             position: "fixed",
-            top: 16,
-            left: 16,
+            top: 20,
+            left: 20,
             zIndex: 1300,
-            bgcolor: "rgba(17, 24, 39, 0.8)",
+            background: "rgba(30, 41, 59, 0.8)",
             backdropFilter: "blur(8px)",
+            border: "1px solid rgba(148, 163, 184, 0.1)",
             "&:hover": {
-              bgcolor: "rgba(17, 24, 39, 0.9)",
+              background: "rgba(30, 41, 59, 0.9)",
             },
           }}>
-          <Menu />
+          <Menu size={20} />
         </IconButton>
       )}
 
@@ -123,9 +138,10 @@ const Sidebar = () => {
             width: SIDEBAR_WIDTH,
             "& .MuiDrawer-paper": {
               width: SIDEBAR_WIDTH,
-              bgcolor: "rgba(17, 24, 39, 0.5)",
-              backdropFilter: "blur(8px)",
-              borderRight: "1px solid rgba(75, 85, 99, 0.3)",
+              background: "rgba(15, 23, 42, 0.8)",
+              backdropFilter: "blur(20px)",
+              border: "none",
+              borderRight: "1px solid rgba(148, 163, 184, 0.1)",
             },
           }}>
           <SidebarContent />
@@ -141,9 +157,9 @@ const Sidebar = () => {
           sx={{
             "& .MuiDrawer-paper": {
               width: SIDEBAR_WIDTH,
-              bgcolor: "rgba(17, 24, 39, 0.95)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(75, 85, 99, 0.3)",
+              background: "rgba(15, 23, 42, 0.95)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(148, 163, 184, 0.1)",
             },
           }}>
           <SidebarContent />
