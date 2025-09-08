@@ -1,14 +1,4 @@
-// src/pages/Dashboard.tsx
-import {
-  Box,
-  Typography,
-  Button,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
-  IconButton,
-} from "@mui/material";
+import { Link } from "react-router-dom";
 import {
   Plus,
   FileText,
@@ -18,7 +8,6 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
-import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { resumes } = useAppStore();
@@ -30,400 +19,159 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 4, p: 1 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { sm: "center" },
-          justifyContent: "space-between",
-          gap: 3,
-        }}>
-        <Box>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: "text.primary",
-              background: "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 0.5,
-            }}>
+    <div className="flex flex-col gap-6 p-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent mb-2">
             Welcome Back
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: "text.secondary",
-              fontWeight: 400,
-            }}>
+          </h1>
+          <p className="text-gray-400 font-normal">
             Manage your professional resumes
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
-        <Button
-          component={Link}
+        <Link
           to="/panel/resume/create"
-          variant="contained"
-          startIcon={<Plus size={18} />}
-          sx={{
-            px: 3,
-            py: 1.5,
-            fontSize: "0.95rem",
-            fontWeight: 600,
-            minWidth: 160,
-          }}>
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-cyan-400 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-purple-500/25 min-w-[160px] justify-center">
+          <Plus size={18} />
           Create Resume
-        </Button>
-      </Box>
+        </Link>
+      </div>
 
-      {/* Stats Cards */}
-      <Grid container spacing={3}>
-        <Grid component="div">
-          <Paper
-            sx={{
-              p: 3,
-              position: "relative",
-              overflow: "hidden",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "3px",
-                background: "linear-gradient(90deg, #8b5cf6 0%, #06b6d4 100%)",
-              },
-            }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  background: "rgba(139, 92, 246, 0.1)",
-                  border: "1px solid rgba(139, 92, 246, 0.2)",
-                }}>
-                <FileText size={20} color="#8b5cf6" />
-              </Box>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}>
-                Total Resumes
-              </Typography>
-            </Box>
-            <Typography
-              variant="h2"
-              sx={{
-                fontWeight: 800,
-                color: "text.primary",
-                fontSize: "2.5rem",
-              }}>
-              {stats.total}
-            </Typography>
-          </Paper>
-        </Grid>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-cyan-400"></div>
 
-        <Grid>
-          <Paper
-            sx={{
-              p: 3,
-              position: "relative",
-              overflow: "hidden",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "3px",
-                background: "linear-gradient(90deg, #22c55e 0%, #16a34a 100%)",
-              },
-            }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  background: "rgba(34, 197, 94, 0.1)",
-                  border: "1px solid rgba(34, 197, 94, 0.2)",
-                }}>
-                <CheckCircle2 size={20} color="#22c55e" />
-              </Box>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}>
-                Completed
-              </Typography>
-            </Box>
-            <Typography
-              variant="h2"
-              sx={{
-                fontWeight: 800,
-                color: "text.primary",
-                fontSize: "2.5rem",
-              }}>
-              {stats.completed}
-            </Typography>
-          </Paper>
-        </Grid>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+              <FileText size={20} className="text-purple-500" />
+            </div>
+            <p className="text-gray-400 font-medium text-xs uppercase tracking-wider">
+              Total Resumes
+            </p>
+          </div>
+          <h2 className="text-4xl font-extrabold text-white">{stats.total}</h2>
+        </div>
 
-        <Grid component="div">
-          <Paper
-            sx={{
-              p: 3,
-              position: "relative",
-              overflow: "hidden",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "3px",
-                background: "linear-gradient(90deg, #f59e0b 0%, #d97706 100%)",
-              },
-            }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  background: "rgba(245, 158, 11, 0.1)",
-                  border: "1px solid rgba(245, 158, 11, 0.2)",
-                }}>
-                <Clock size={20} color="#f59e0b" />
-              </Box>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}>
-                In Progress
-              </Typography>
-            </Box>
-            <Typography
-              variant="h2"
-              sx={{
-                fontWeight: 800,
-                color: "text.primary",
-                fontSize: "2.5rem",
-              }}>
-              {stats.inProgress}
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-emerald-600"></div>
 
-      {/* Recent Resumes */}
-      <Paper sx={{ p: 4, minHeight: "400px" }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 4,
-          }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+              <CheckCircle2 size={20} className="text-green-500" />
+            </div>
+            <p className="text-gray-400 font-medium text-xs uppercase tracking-wider">
+              Completed
+            </p>
+          </div>
+          <h2 className="text-4xl font-extrabold text-white">
+            {stats.completed}
+          </h2>
+        </div>
+
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-600"></div>
+
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <Clock size={20} className="text-amber-500" />
+            </div>
+            <p className="text-gray-400 font-medium text-xs uppercase tracking-wider">
+              In Progress
+            </p>
+          </div>
+          <h2 className="text-4xl font-extrabold text-white">
+            {stats.inProgress}
+          </h2>
+        </div>
+      </div>
+
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 min-h-[400px]">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-semibold text-white flex items-center gap-3">
             <FileText size={24} />
             Recent Resumes
-          </Typography>
-        </Box>
+          </h2>
+        </div>
 
         {resumes.length === 0 ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              py: 8,
-              textAlign: "center",
-            }}>
-            <Box
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                background: "rgba(139, 92, 246, 0.05)",
-                border: "2px dashed rgba(139, 92, 246, 0.2)",
-                mb: 3,
-              }}>
-              <FileText size={48} color="#8b5cf6" />
-            </Box>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: "text.primary",
-                mb: 1,
-              }}>
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <div className="p-6 rounded-2xl bg-purple-500/5 border-2 border-dashed border-purple-500/20 mb-6">
+              <FileText size={48} className="text-purple-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
               No resumes yet
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: "text.secondary",
-                mb: 4,
-                maxWidth: 300,
-              }}>
+            </h3>
+            <p className="text-gray-400 mb-8 max-w-sm">
               Start building your professional resume to showcase your skills
               and experience
-            </Typography>
-            <Button
-              component={Link}
+            </p>
+            <Link
               to="/panel/resume/create"
-              variant="contained"
-              startIcon={<Plus size={18} />}
-              sx={{
-                px: 4,
-                py: 1.5,
-                fontSize: "1rem",
-                fontWeight: 600,
-              }}>
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-cyan-400 text-white px-8 py-3 rounded-xl font-semibold text-base transition-all hover:shadow-lg hover:shadow-purple-500/25">
+              <Plus size={18} />
               Create Your First Resume
-            </Button>
-          </Box>
+            </Link>
+          </div>
         ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <div className="flex flex-col gap-4">
             {resumes.slice(0, 5).map((resume) => (
-              <Card
+              <div
                 key={resume.id}
-                sx={{
-                  background: "rgba(51, 65, 85, 0.3)",
-                  border: "1px solid rgba(148, 163, 184, 0.1)",
-                  backdropFilter: "blur(8px)",
-                  "&:hover": {
-                    background: "rgba(51, 65, 85, 0.5)",
-                    border: "1px solid rgba(139, 92, 246, 0.3)",
-                    transform: "translateY(-2px)",
-                  },
-                  transition: "all 0.3s ease",
-                  cursor: "pointer",
-                }}>
-                <CardContent sx={{ p: 3 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-                      <Box
-                        sx={{
-                          p: 2,
-                          borderRadius: 3,
-                          background:
-                            "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)",
-                          border: "1px solid rgba(139, 92, 246, 0.2)",
-                        }}>
-                        <FileText size={20} color="#8b5cf6" />
-                      </Box>
-                      <Box>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 600,
-                            color: "text.primary",
-                            mb: 0.5,
-                          }}>
-                          {resume.title}
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 2,
-                          }}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}>
-                            <Calendar size={14} color="#cbd5e1" />
-                            <Typography
-                              variant="body2"
-                              sx={{ color: "text.secondary" }}>
-                              Updated{" "}
-                              {new Date(resume.updatedAt).toLocaleDateString()}
-                            </Typography>
-                          </Box>
-                          <Box
-                            sx={{
-                              px: 2,
-                              py: 0.5,
-                              borderRadius: 2,
-                              background: resume.isCompleted
-                                ? "rgba(34, 197, 94, 0.1)"
-                                : "rgba(245, 158, 11, 0.1)",
-                              border: resume.isCompleted
-                                ? "1px solid rgba(34, 197, 94, 0.2)"
-                                : "1px solid rgba(245, 158, 11, 0.2)",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}>
-                            {resume.isCompleted ? (
-                              <CheckCircle2 size={12} color="#22c55e" />
-                            ) : (
-                              <Clock size={12} color="#f59e0b" />
-                            )}
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: resume.isCompleted
-                                  ? "#22c55e"
-                                  : "#f59e0b",
-                                fontWeight: 500,
-                                fontSize: "0.75rem",
-                              }}>
-                              {resume.isCompleted ? "Complete" : "In Progress"}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Box>
-                    <IconButton
-                      sx={{
-                        color: "text.secondary",
-                        "&:hover": {
-                          background: "rgba(139, 92, 246, 0.1)",
-                          color: "primary.main",
-                        },
-                      }}>
-                      <MoreVertical size={18} />
-                    </IconButton>
-                  </Box>
-                </CardContent>
-              </Card>
+                className="bg-slate-700/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-600/20 hover:bg-slate-700/50 hover:border-purple-500/30 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-cyan-400/10 border border-purple-500/20 group-hover:border-purple-500/40 transition-colors">
+                      <FileText size={20} className="text-purple-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">
+                        {resume.title}
+                      </h3>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar size={14} className="text-slate-400" />
+                          <span className="text-sm text-slate-400">
+                            Updated{" "}
+                            {new Date(resume.updatedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div
+                          className={`px-3 py-1 rounded-lg border flex items-center gap-2 ${
+                            resume.isCompleted
+                              ? "bg-green-500/10 border-green-500/20"
+                              : "bg-amber-500/10 border-amber-500/20"
+                          }`}>
+                          {resume.isCompleted ? (
+                            <CheckCircle2
+                              size={12}
+                              className="text-green-500"
+                            />
+                          ) : (
+                            <Clock size={12} className="text-amber-500" />
+                          )}
+                          <span
+                            className={`text-xs font-medium ${
+                              resume.isCompleted
+                                ? "text-green-500"
+                                : "text-amber-500"
+                            }`}>
+                            {resume.isCompleted ? "Complete" : "In Progress"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="p-2 rounded-lg text-slate-400 hover:bg-purple-500/10 hover:text-purple-500 transition-colors">
+                    <MoreVertical size={18} />
+                  </button>
+                </div>
+              </div>
             ))}
-          </Box>
+          </div>
         )}
-      </Paper>
-    </Box>
+      </div>
+    </div>
   );
 };
 

@@ -1,26 +1,15 @@
-import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
-
-// components
 import Sidebar from "@/components/layout/user/Sidebar";
-
-// const SIDEBAR_WIDTH = 256;
 
 const PanelLayout = () => {
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <div className="flex min-h-screen bg-slate-950">
       <Sidebar />
 
-      <Box
-        sx={{
-          flexGrow: 1,
-          // ml: { md: `${SIDEBAR_WIDTH}px` },
-          p: 3,
-          bgcolor: "background.default",
-        }}>
+      <main className="flex-1 md:ml-[280px] p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <Outlet />
-      </Box>
-    </Box>
+      </main>
+    </div>
   );
 };
 

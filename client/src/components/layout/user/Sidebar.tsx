@@ -1,19 +1,5 @@
-// src/components/layout/Sidebar.tsx
-import {
-  Box,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { Plus, Menu, FileText, Gauge } from "lucide-react";
-import { useAppStore } from "@/stores/appStore";
+import { useState } from "react";
+import { Plus, Menu, Gauge, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import type { SidebarItem } from "@/types/user";
 
@@ -35,136 +21,75 @@ const sidebarItems: SidebarItem[] = [
 const SIDEBAR_WIDTH = 280;
 
 const Sidebar = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const { isSidebarOpen, toggleSidebar } = useAppStore();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const location = useLocation();
 
-  const SidebarContent = () => (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 4,
-        p: 3,
-        height: "100%",
-      }}>
-      {/* Logo/Brand */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, px: 1 }}>
-        <p className="text-2xl bg-gradient-to-r from-primary-800 via-primary-600 to-primary-500 bg-clip-text text-transparent font-bold">
+  const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
+
+  const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
+    <div className="w-full flex flex-col gap-8 p-6 h-full">
+      <div className="flex items-center gap-3 px-2">
+        <p className="text-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-cyan-400 bg-clip-text text-transparent font-bold">
           CVisionary
         </p>
-      </Box>
+      </div>
 
-      {/* Navigation */}
-      <List sx={{ p: 0 }}>
-        {sidebarItems.map((item) => (
-          <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-            <ListItemButton
-              component={Link}
+      <nav className="w-full flex flex-col gap-2">
+        {sidebarItems.map((item) => {
+          const isActive = location.pathname === item.path;
+
+          return (
+            <Link
+              key={item.id}
               to={item.path}
-              selected={location.pathname === item.path}
-              sx={{
-                borderRadius: 3,
-                px: 2,
-                py: 1.5,
-                color: "text.secondary",
-                background:
-                  location.pathname === item.path
-                    ? "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)"
-                    : "transparent",
-                border:
-                  location.pathname === item.path
-                    ? "1px solid rgba(139, 92, 246, 0.2)"
-                    : "1px solid transparent",
-                "&:hover": {
-                  background: "rgba(139, 92, 246, 0.08)",
-                  border: "1px solid rgba(139, 92, 246, 0.1)",
-                  color: "text.primary",
-                },
-                "&.Mui-selected": {
-                  color: "primary.main",
-                  fontWeight: 600,
-                },
-              }}>
-              <ListItemIcon
-                sx={{
-                  color: "inherit",
-                  minWidth: 36,
-                }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: "0.9rem",
-                  fontWeight: "inherit",
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+              onClick={onItemClick}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                isActive
+                  ? "bg-gradient-to-br from-purple-500/10 to-cyan-400/10 border border-purple-500/20 text-purple-400 font-semibold"
+                  : "text-slate-400 hover:bg-purple-500/8 hover:border-purple-500/10 hover:text-slate-200 border border-transparent"
+              }`}>
+              <div className="flex-shrink-0">{item.icon}</div>
+              <span className="text-sm font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <IconButton
-          onClick={toggleSidebar}
-          sx={{
-            position: "fixed",
-            top: 20,
-            left: 20,
-            zIndex: 1300,
-            background: "rgba(30, 41, 59, 0.8)",
-            backdropFilter: "blur(8px)",
-            border: "1px solid rgba(148, 163, 184, 0.1)",
-            "&:hover": {
-              background: "rgba(30, 41, 59, 0.9)",
-            },
-          }}>
-          <Menu size={20} />
-        </IconButton>
+      <button
+        onClick={toggleMobile}
+        className="md:hidden fixed top-5 left-5 z-50 p-3 bg-slate-800/80 backdrop-blur-sm border border-slate-600/20 rounded-xl text-slate-200 hover:bg-slate-800/90 hover:text-white transition-colors">
+        <Menu size={20} />
+      </button>
+
+      <div
+        className="hidden md:flex w-[280px] h-screen bg-slate-900/80 backdrop-blur-xl border-r border-slate-700/20 fixed left-0 top-0"
+        style={{ width: SIDEBAR_WIDTH }}>
+        <SidebarContent />
+      </div>
+
+      {isMobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={toggleMobile}
+        />
       )}
 
-      {/* Desktop Sidebar */}
-      {!isMobile && (
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: SIDEBAR_WIDTH,
-            "& .MuiDrawer-paper": {
-              width: SIDEBAR_WIDTH,
-              background: "rgba(15, 23, 42, 0.8)",
-              backdropFilter: "blur(20px)",
-              border: "none",
-              borderRight: "1px solid rgba(148, 163, 184, 0.1)",
-            },
-          }}>
-          <SidebarContent />
-        </Drawer>
-      )}
+      <div
+        className={`md:hidden fixed left-0 top-0 h-screen w-[280px] bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/20 z-50 transition-transform duration-300 ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}>
+        <button
+          onClick={toggleMobile}
+          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors">
+          <X size={20} />
+        </button>
 
-      {/* Mobile Sidebar */}
-      {isMobile && (
-        <Drawer
-          variant="temporary"
-          open={isSidebarOpen}
-          onClose={toggleSidebar}
-          sx={{
-            "& .MuiDrawer-paper": {
-              width: SIDEBAR_WIDTH,
-              background: "rgba(15, 23, 42, 0.95)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(148, 163, 184, 0.1)",
-            },
-          }}>
-          <SidebarContent />
-        </Drawer>
-      )}
+        <SidebarContent onItemClick={toggleMobile} />
+      </div>
     </>
   );
 };
