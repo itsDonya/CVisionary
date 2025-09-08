@@ -1,3 +1,4 @@
+import type { Experience } from "@/types/resume";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -13,16 +14,16 @@ interface PersonalInfo {
   photo?: string;
 }
 
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  startDate: string;
-  endDate?: string;
-  current: boolean;
-  description: string;
-  location?: string;
-}
+// interface Experience {
+//   id: string;
+//   company: string;
+//   position: string;
+//   startDate: string;
+//   endDate?: string;
+//   current: boolean;
+//   description: string;
+//   location?: string;
+// }
 
 interface Education {
   id: string;
@@ -328,50 +329,101 @@ export const useAppStore = create<AppState>()(
       },
 
       // Experience Actions
-      addExperience: (experience) => {
-        const currentResume = get().currentResume;
+      addExperience: () => {
         const newExperience: Experience = {
-          ...experience,
-          id: `exp_${Date.now()}`,
+          // id: uuidv4(),
+          id: String(Math.random()),
+          company: "",
+          position: "",
+          location: "",
+          startDate: "",
+          endDate: "",
+          isCurrentJob: false,
+          description: "",
+          achievements: [],
         };
 
-        set({
+        set((state) => ({
           currentResume: {
-            ...currentResume,
-            experience: [...currentResume.experience, newExperience],
-            updatedAt: new Date().toISOString(),
+            ...state.currentResume,
+            experience: [...state.currentResume.experience, newExperience],
           },
-        });
+        }));
       },
 
-      updateExperience: (id, experience) => {
-        const currentResume = get().currentResume;
-        const updatedExperience = currentResume.experience.map((exp) =>
-          exp.id === id ? { ...exp, ...experience } : exp
-        );
-
-        set({
+      updateExperience: (id: string, updates: Partial<Experience>) => {
+        set((state) => ({
           currentResume: {
-            ...currentResume,
-            experience: updatedExperience,
-            updatedAt: new Date().toISOString(),
+            ...state.currentResume,
+            experience: state.currentResume.experience.map((exp) =>
+              exp.id === id ? { ...exp, ...updates } : exp
+            ),
           },
-        });
+        }));
       },
 
-      deleteExperience: (id) => {
-        const currentResume = get().currentResume;
-        const updatedExperience = currentResume.experience.filter(
-          (exp) => exp.id !== id
-        );
-
-        set({
+      deleteExperience: (id: string) => {
+        set((state) => ({
           currentResume: {
-            ...currentResume,
-            experience: updatedExperience,
-            updatedAt: new Date().toISOString(),
+            ...state.currentResume,
+            experience: state.currentResume.experience.filter(
+              (exp) => exp.id !== id
+            ),
           },
-        });
+        }));
+      },
+
+      addAchievement: (experienceId: string, achievement: string) => {
+        set((state) => ({
+          currentResume: {
+            ...state.currentResume,
+            experience: state.currentResume.experience.map((exp) =>
+              exp.id === experienceId
+                ? { ...exp, achievements: [...exp.achievements, achievement] }
+                : exp
+            ),
+          },
+        }));
+      },
+
+      updateAchievement: (
+        experienceId: string,
+        achievementIndex: number,
+        achievement: string
+      ) => {
+        set((state) => ({
+          currentResume: {
+            ...state.currentResume,
+            experience: state.currentResume.experience.map((exp) =>
+              exp.id === experienceId
+                ? {
+                    ...exp,
+                    achievements: exp.achievements.map((ach, index) =>
+                      index === achievementIndex ? achievement : ach
+                    ),
+                  }
+                : exp
+            ),
+          },
+        }));
+      },
+
+      removeAchievement: (experienceId: string, achievementIndex: number) => {
+        set((state) => ({
+          currentResume: {
+            ...state.currentResume,
+            experience: state.currentResume.experience.map((exp) =>
+              exp.id === experienceId
+                ? {
+                    ...exp,
+                    achievements: exp.achievements.filter(
+                      (_, index) => index !== achievementIndex
+                    ),
+                  }
+                : exp
+            ),
+          },
+        }));
       },
 
       // Education Actions

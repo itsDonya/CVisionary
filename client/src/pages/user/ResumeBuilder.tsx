@@ -11,7 +11,10 @@ import {
   Save,
 } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
+
+// steps
 import PersonalInfoStep from "@/components/user/resume-builder/PersonalInfoStep";
+import ExperienceStep from "@/components/user/resume-builder/ExperienceStep";
 
 const steps = [
   {
@@ -96,21 +99,17 @@ const ResumeBuilder = () => {
       case 0:
         return <PersonalInfoStep />;
       case 1:
-        return (
-          <div className="p-8 text-center text-slate-400">
-            Experience Step - Coming Soon
-          </div>
-        );
+        return <ExperienceStep />;
       case 2:
         return (
           <div className="p-8 text-center text-slate-400">
-            Education Step - Coming Soon
+            education step - coming soon
           </div>
         );
       case 3:
         return (
           <div className="p-8 text-center text-slate-400">
-            Skills Step - Coming Soon
+            skills step - coming soon
           </div>
         );
       default:
