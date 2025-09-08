@@ -93,9 +93,18 @@ interface AppState {
   updatePersonalInfo: (personalInfo: Partial<PersonalInfo>) => void;
 
   // Actions - Experience
-  addExperience: (experience: Omit<Experience, "id">) => void;
-  updateExperience: (id: string, experience: Partial<Experience>) => void;
+  addExperience: () => void;
+  updateExperience: (id: string, updates: Partial<Experience>) => void;
   deleteExperience: (id: string) => void;
+
+  // Actions - Achievement
+  addAchievement: (experienceId: string, achievement: string) => void;
+  updateAchievement: (
+    experienceId: string,
+    achievementIndex: number,
+    achievement: string
+  ) => void;
+  removeAchievement: (experienceId: string, achievementIndex: number) => void;
 
   // Actions - Education
   addEducation: (education: Omit<Education, "id">) => void;
