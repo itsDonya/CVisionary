@@ -1,21 +1,16 @@
-// src/components/user/resume-builder/SkillsStep.tsx
-
 import { useState } from "react";
 import {
   TextField,
   Button,
   IconButton,
-  Chip,
   Rating,
   ToggleButton,
   ToggleButtonGroup,
-  Box,
   Card,
   CardContent,
 } from "@mui/material";
 import {
   Code,
-  Wrench,
   Languages,
   Plus,
   Trash2,
@@ -23,7 +18,7 @@ import {
   Zap,
   Brain,
   Globe,
-  X,
+  //   X,
 } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 
@@ -89,15 +84,15 @@ const SkillsStep = () => {
     return currentResume.skills.filter((skill) => skill.category === category);
   };
 
-  const getCategoryColor = (category: string) => {
-    const categoryData = skillCategories.find((cat) => cat.value === category);
-    return categoryData?.color || "blue";
-  };
+  //   const getCategoryColor = (category: string) => {
+  //     const categoryData = skillCategories.find((cat) => cat.value === category);
+  //     return categoryData?.color || "blue";
+  //   };
 
-  const getCategoryIcon = (category: string) => {
-    const categoryData = skillCategories.find((cat) => cat.value === category);
-    return categoryData?.icon || Code;
-  };
+  //   const getCategoryIcon = (category: string) => {
+  //     const categoryData = skillCategories.find((cat) => cat.value === category);
+  //     return categoryData?.icon || Code;
+  //   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 p-6">
