@@ -16,6 +16,7 @@ import { useAppStore } from "@/stores/appStore";
 import PersonalInfoStep from "@/components/user/resume-builder/PersonalInfoStep";
 import ExperienceStep from "@/components/user/resume-builder/ExperienceStep";
 import EducationStep from "@/components/user/resume-builder/EducationStep";
+import SkillsStep from "@/components/user/resume-builder/SkillsStep";
 
 const steps = [
   {
@@ -104,11 +105,7 @@ const ResumeBuilder = () => {
       case 2:
         return <EducationStep />;
       case 3:
-        return (
-          <div className="p-8 text-center text-slate-400">
-            skills step - coming soon
-          </div>
-        );
+        return <SkillsStep />;
       default:
         return <PersonalInfoStep />;
     }
