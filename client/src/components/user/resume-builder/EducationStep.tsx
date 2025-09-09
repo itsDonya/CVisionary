@@ -117,6 +117,7 @@ const EducationStep = () => {
                     </p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <IconButton
                     onClick={() => toggleExpanded(edu.id)}
