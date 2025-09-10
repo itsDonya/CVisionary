@@ -1,6 +1,28 @@
 import { useState } from "react";
-import { Button, Card, CardMedia, CardContent, Chip } from "@mui/material";
-import { Palette, Eye, Download, Zap, Crown, Check } from "lucide-react";
+import {
+  Button,
+  Card,
+  CardMedia,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Zoom,
+} from "@mui/material";
+import {
+  Palette,
+  Eye,
+  Download,
+  Zap,
+  Crown,
+  Check,
+  X,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+} from "lucide-react";
 
 import type { Template } from "@/types/resume";
 
@@ -54,20 +76,47 @@ const TemplateStep = () => {
   const [selectedTemplate, setSelectedTemplate] =
     useState<string>("template-1");
   const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
+  const [imageZoom, setImageZoom] = useState<number>(1);
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
   };
 
   const handlePreview = (templateId: string) => {
-    console.log("Preview template:", templateId);
-    // Add preview logic here
+    const template = templates.find((t) => t.id === templateId);
+    if (template) {
+      setPreviewTemplate(template);
+      setImageZoom(1); // Reset zoom
+      setPreviewOpen(true);
+    }
+  };
+
+  const handleClosePreview = () => {
+    setPreviewOpen(false);
+    setPreviewTemplate(null);
+    setImageZoom(1);
+  };
+
+  const handleZoomIn = () => {
+    setImageZoom((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setImageZoom((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    setImageZoom(1);
   };
 
   const handleDownload = () => {
     console.log("Download resume with template:", selectedTemplate);
     // Add download logic here
   };
+
+  //   const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 p-6">
@@ -158,11 +207,13 @@ const TemplateStep = () => {
                         color: "black",
                         "&:hover": {
                           backgroundColor: "white",
+                          transform: "scale(1.05)",
                         },
                         borderRadius: 1,
                         px: 2,
                         py: 0.5,
                         fontSize: "0.75rem",
+                        transition: "all 0.2s ease",
                       }}>
                       Preview
                     </Button>
@@ -243,9 +294,11 @@ const TemplateStep = () => {
               borderColor: "rgba(139, 92, 246, 0.5)",
               backgroundColor: "rgba(139, 92, 246, 0.1)",
               color: "rgba(139, 92, 246, 1)",
+              transform: "translateY(-1px)",
             },
+            transition: "all 0.2s ease",
           }}>
-          Preview Resume
+          Preview Selected Template
         </Button>
 
         <Button
@@ -291,6 +344,210 @@ const TemplateStep = () => {
           </div>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      <Dialog
+        open={previewOpen}
+        onClose={handleClosePreview}
+        maxWidth="lg"
+        fullWidth
+        TransitionComponent={Zoom}
+        PaperProps={{
+          sx: {
+            backgroundColor: "rgba(15, 23, 42, 0.95)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(51, 65, 85, 0.3)",
+            borderRadius: 2,
+            maxHeight: "90vh",
+          },
+        }}>
+        <DialogTitle sx={{ p: 0 }}>
+          <div className="flex items-center justify-between p-6 border-b border-slate-600/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-400/20 rounded-lg border border-purple-500/30">
+                <Eye className="w-5 h-5 text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-200">
+                  {previewTemplate?.name}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Chip
+                    label={
+                      categoryColors[previewTemplate?.category || "modern"].text
+                    }
+                    size="small"
+                    sx={{
+                      backgroundColor: `${
+                        categoryColors[previewTemplate?.category || "modern"].bg
+                      }20`,
+                      color:
+                        categoryColors[previewTemplate?.category || "modern"]
+                          .bg,
+                      fontSize: "0.7rem",
+                      height: "22px",
+                    }}
+                  />
+                  {previewTemplate?.isPremium && (
+                    <Chip
+                      label="Premium"
+                      size="small"
+                      icon={<Crown className="w-3 h-3" />}
+                      sx={{
+                        backgroundColor: "rgba(251, 191, 36, 0.2)",
+                        color: "#fbbf24",
+                        fontSize: "0.7rem",
+                        height: "22px",
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-1 bg-slate-700/50 rounded-lg p-1">
+                <IconButton
+                  onClick={handleZoomOut}
+                  disabled={imageZoom <= 0.5}
+                  size="small"
+                  sx={{
+                    color: "rgba(148, 163, 184, 1)",
+                    "&:hover": { backgroundColor: "rgba(139, 92, 246, 0.1)" },
+                  }}>
+                  <ZoomOut className="w-4 h-4" />
+                </IconButton>
+
+                <span className="text-slate-400 text-sm min-w-[60px] text-center">
+                  {Math.round(imageZoom * 100)}%
+                </span>
+
+                <IconButton
+                  onClick={handleZoomIn}
+                  disabled={imageZoom >= 3}
+                  size="small"
+                  sx={{
+                    color: "rgba(148, 163, 184, 1)",
+                    "&:hover": { backgroundColor: "rgba(139, 92, 246, 0.1)" },
+                  }}>
+                  <ZoomIn className="w-4 h-4" />
+                </IconButton>
+
+                <IconButton
+                  onClick={handleResetZoom}
+                  size="small"
+                  sx={{
+                    color: "rgba(148, 163, 184, 1)",
+                    "&:hover": { backgroundColor: "rgba(139, 92, 246, 0.1)" },
+                  }}>
+                  <RotateCcw className="w-4 h-4" />
+                </IconButton>
+              </div>
+
+              <IconButton
+                onClick={handleClosePreview}
+                sx={{
+                  color: "rgba(148, 163, 184, 1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(239, 68, 68, 0.1)",
+                    color: "#ef4444",
+                  },
+                }}>
+                <X className="w-5 h-5" />
+              </IconButton>
+            </div>
+          </div>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 0, overflow: "hidden" }}>
+          <div className="p-6">
+            {/* Template Description */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-slate-700/20 to-slate-800/20 rounded-lg border border-slate-600/30">
+              <p className="text-slate-300 mb-3">
+                {previewTemplate?.description}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {previewTemplate?.features.map((feature, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center gap-1 bg-slate-600/30 text-slate-300 px-2 py-1 rounded text-sm">
+                    <Zap className="w-3 h-3" />
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Template Image Preview */}
+            <div
+              className="flex justify-center overflow-auto max-h-[60vh] bg-slate-900/50 rounded-lg p-4"
+              style={{ scrollbarWidth: "thin" }}>
+              {previewTemplate && (
+                <img
+                  src={previewTemplate.preview}
+                  alt={previewTemplate.name}
+                  style={{
+                    transform: `scale(${imageZoom})`,
+                    transition: "transform 0.3s ease",
+                    maxWidth: "100%",
+                    height: "auto",
+                    borderRadius: "8px",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-slate-600/30">
+              <Button
+                onClick={() => {
+                  if (previewTemplate) {
+                    handleTemplateSelect(previewTemplate.id);
+                    handleClosePreview();
+                  }
+                }}
+                startIcon={<Check className="w-4 h-4" />}
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  borderColor: "rgba(139, 92, 246, 0.5)",
+                  color: "rgba(139, 92, 246, 1)",
+                  "&:hover": {
+                    borderColor: "rgba(139, 92, 246, 0.8)",
+                    backgroundColor: "rgba(139, 92, 246, 0.1)",
+                  },
+                }}>
+                Select This Template
+              </Button>
+
+              <Button
+                onClick={handleDownload}
+                startIcon={<Download className="w-4 h-4" />}
+                sx={{
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  background:
+                    "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)",
+                  color: "white",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 10px 25px rgba(139, 92, 246, 0.3)",
+                  },
+                  transition: "all 0.2s ease",
+                }}>
+                Generate with This Template
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
