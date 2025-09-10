@@ -1,4 +1,3 @@
-// components/ResumeBuilder/TemplateStep.tsx
 import { useState } from "react";
 import { Button, Card, CardMedia, CardContent, Chip } from "@mui/material";
 import { Palette, Eye, Download, Zap, Crown, Check } from "lucide-react";
@@ -71,10 +70,10 @@ const TemplateStep = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 p-6">
+    <div className="max-w-7xl mx-auto space-y-8 p-6">
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-400/20 rounded-xl border border-purple-500/30">
+          <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-400/20 rounded-lg border border-purple-500/30">
             <Palette className="w-6 h-6 text-purple-400" />
           </div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -87,7 +86,7 @@ const TemplateStep = () => {
       </div>
 
       {/* Template Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {templates.map((template) => {
           const isSelected = selectedTemplate === template.id;
           const isHovered = hoveredTemplate === template.id;
@@ -102,7 +101,7 @@ const TemplateStep = () => {
                   : "bg-gradient-to-br from-slate-700/30 to-slate-800/30 hover:from-slate-700/40 hover:to-slate-800/40"
               }`}
               sx={{
-                borderRadius: 4,
+                borderRadius: 2,
                 border: "1px solid rgba(51, 65, 85, 0.3)",
                 backdropFilter: "blur(10px)",
                 overflow: "hidden",
@@ -112,8 +111,8 @@ const TemplateStep = () => {
               onClick={() => handleTemplateSelect(template.id)}>
               {/* Premium Badge */}
               {template.isPremium && (
-                <div className="absolute top-3 right-3 z-10">
-                  <div className="bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs font-medium">
+                <div className="absolute top-2 right-2 z-10">
+                  <div className="bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-1 rounded-md flex items-center gap-1 text-xs font-medium">
                     <Crown className="w-3 h-3" />
                     Premium
                   </div>
@@ -122,22 +121,22 @@ const TemplateStep = () => {
 
               {/* Selected Badge */}
               {isSelected && (
-                <div className="absolute top-3 left-3 z-10">
-                  <div className="bg-purple-500 text-white p-1 rounded-full">
-                    <Check className="w-4 h-4" />
+                <div className="absolute top-2 left-2 z-10">
+                  <div className="bg-purple-500 text-white p-1 rounded-md">
+                    <Check className="w-3 h-3" />
                   </div>
                 </div>
               )}
 
-              {/* Template Preview */}
+              {/* Template Preview - Vertical Rectangle */}
               <div className="relative overflow-hidden">
                 <CardMedia
                   component="img"
-                  height="300"
                   image={template.preview}
                   alt={template.name}
                   sx={{
-                    height: 300,
+                    height: 220,
+                    width: "100%",
                     objectFit: "cover",
                     transition: "transform 0.3s ease",
                     transform: isHovered ? "scale(1.05)" : "scale(1)",
@@ -146,22 +145,24 @@ const TemplateStep = () => {
 
                 {/* Overlay on Hover */}
                 {isHovered && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-300">
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePreview(template.id);
                       }}
                       startIcon={<Eye className="w-4 h-4" />}
+                      size="small"
                       sx={{
                         backgroundColor: "rgba(255, 255, 255, 0.9)",
                         color: "black",
                         "&:hover": {
                           backgroundColor: "white",
                         },
-                        borderRadius: 2,
+                        borderRadius: 1,
                         px: 2,
-                        py: 1,
+                        py: 0.5,
+                        fontSize: "0.75rem",
                       }}>
                       Preview
                     </Button>
@@ -170,14 +171,14 @@ const TemplateStep = () => {
               </div>
 
               {/* Template Info */}
-              <CardContent sx={{ p: 3 }}>
-                <div className="space-y-3">
+              <CardContent sx={{ p: 2 }}>
+                <div className="space-y-2">
                   <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-slate-200 text-lg">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-200 text-sm truncate">
                         {template.name}
                       </h3>
-                      <p className="text-slate-400 text-sm mt-1">
+                      <p className="text-slate-400 text-xs mt-1 line-clamp-2">
                         {template.description}
                       </p>
                     </div>
@@ -187,30 +188,36 @@ const TemplateStep = () => {
                       sx={{
                         backgroundColor: `${categoryInfo.bg}20`,
                         color: categoryInfo.bg,
-                        fontSize: "0.7rem",
-                        height: "24px",
+                        fontSize: "0.65rem",
+                        height: "20px",
                         fontWeight: 500,
+                        ml: 1,
                       }}
                     />
                   </div>
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-1">
-                    {template.features.map((feature, index) => (
+                    {template.features.slice(0, 2).map((feature, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center gap-1 bg-slate-600/30 text-slate-300 px-2 py-1 rounded-md text-xs">
-                        <Zap className="w-3 h-3" />
+                        className="inline-flex items-center gap-1 bg-slate-600/30 text-slate-300 px-1.5 py-0.5 rounded text-xs">
+                        <Zap className="w-2 h-2" />
                         {feature}
                       </span>
                     ))}
+                    {template.features.length > 2 && (
+                      <span className="inline-flex items-center bg-slate-600/30 text-slate-300 px-1.5 py-0.5 rounded text-xs">
+                        +{template.features.length - 2}
+                      </span>
+                    )}
                   </div>
 
                   {/* Selection Status */}
                   {isSelected && (
-                    <div className="flex items-center gap-2 text-purple-400 text-sm font-medium">
-                      <Check className="w-4 h-4" />
-                      Selected Template
+                    <div className="flex items-center gap-1 text-purple-400 text-xs font-medium">
+                      <Check className="w-3 h-3" />
+                      Selected
                     </div>
                   )}
                 </div>
@@ -227,7 +234,7 @@ const TemplateStep = () => {
           startIcon={<Eye className="w-4 h-4" />}
           variant="outlined"
           sx={{
-            borderRadius: 3,
+            borderRadius: 2,
             px: 4,
             py: 1.5,
             borderColor: "rgba(148, 163, 184, 0.3)",
@@ -245,7 +252,7 @@ const TemplateStep = () => {
           onClick={handleDownload}
           startIcon={<Download className="w-4 h-4" />}
           sx={{
-            borderRadius: 3,
+            borderRadius: 2,
             px: 4,
             py: 1.5,
             background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)",
@@ -262,7 +269,7 @@ const TemplateStep = () => {
       </div>
 
       {/* Template Stats */}
-      <div className="bg-gradient-to-r from-slate-700/20 to-slate-800/20 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
+      <div className="bg-gradient-to-r from-slate-700/20 to-slate-800/20 backdrop-blur-sm rounded-lg border border-slate-600/30 p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           <div>
             <div className="text-2xl font-bold text-purple-400 mb-1">
