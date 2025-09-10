@@ -17,3 +17,12 @@ export interface Experience {
   description: string;
   achievements: string[];
 }
+
+export interface Achievement {
+  id: string;
+  title: string;
+  category: string;
+  date?: string;
+  description?: string;
+  issuer?: string;
+}

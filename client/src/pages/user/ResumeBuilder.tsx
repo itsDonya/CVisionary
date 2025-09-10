@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Save,
+  Award,
 } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 
@@ -17,6 +18,7 @@ import PersonalInfoStep from "@/components/user/resume-builder/PersonalInfoStep"
 import ExperienceStep from "@/components/user/resume-builder/ExperienceStep";
 import EducationStep from "@/components/user/resume-builder/EducationStep";
 import SkillsStep from "@/components/user/resume-builder/SkillsStep";
+import AchievementStep from "@/components/user/resume-builder/AchievementStep";
 
 const steps = [
   {
@@ -30,6 +32,12 @@ const steps = [
     title: "Experience",
     icon: Briefcase,
     description: "Work history",
+  },
+  {
+    id: "achievement",
+    title: "Achievement",
+    icon: Award,
+    description: "Proessional Achievements",
   },
   {
     id: "education",
@@ -103,8 +111,10 @@ const ResumeBuilder = () => {
       case 1:
         return <ExperienceStep />;
       case 2:
-        return <EducationStep />;
+        return <AchievementStep />;
       case 3:
+        return <EducationStep />;
+      case 4:
         return <SkillsStep />;
       default:
         return <PersonalInfoStep />;
