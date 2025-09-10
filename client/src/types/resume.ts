@@ -26,3 +26,13 @@ export interface Achievement {
   description?: string;
   issuer?: string;
 }
+
+export interface Template {
+  id: string;
+  name: string;
+  preview: string;
+  category: "modern" | "classic" | "creative" | "minimal";
+  isPremium: boolean;
+  description: string;
+  features: string[];
+}

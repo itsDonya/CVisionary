@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Save,
   Award,
+  Palette,
 } from "lucide-react";
 import { useAppStore } from "@/stores/appStore";
 
@@ -19,6 +20,7 @@ import ExperienceStep from "@/components/user/resume-builder/ExperienceStep";
 import EducationStep from "@/components/user/resume-builder/EducationStep";
 import SkillsStep from "@/components/user/resume-builder/SkillsStep";
 import AchievementStep from "@/components/user/resume-builder/AchievementStep";
+import TemplateStep from "@/components/user/resume-builder/TemplateStep";
 
 const steps = [
   {
@@ -50,6 +52,12 @@ const steps = [
     title: "Skills",
     icon: Wrench,
     description: "Technical & soft skills",
+  },
+  {
+    id: "template",
+    title: "Template",
+    icon: Palette,
+    description: "Choose a template & customize",
   },
 ];
 
@@ -116,6 +124,8 @@ const ResumeBuilder = () => {
         return <EducationStep />;
       case 4:
         return <SkillsStep />;
+      case 5:
+        return <TemplateStep />;
       default:
         return <PersonalInfoStep />;
     }
