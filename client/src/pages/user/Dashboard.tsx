@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   FileText,
@@ -10,12 +11,19 @@ import {
 import { useAppStore } from "@/stores/appStore";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { resumes } = useAppStore();
 
   const stats = {
     total: resumes.length,
     completed: resumes.filter((r) => r.isCompleted).length,
     inProgress: resumes.filter((r) => !r.isCompleted).length,
+  };
+
+  // methods
+  const handleOpenResume = (id: string) => {
+    console.log("test");
+    navigate(`/panel/resume/${id}`);
   };
 
   return (
@@ -118,6 +126,7 @@ const Dashboard = () => {
             {resumes.slice(0, 5).map((resume) => (
               <div
                 key={resume.id}
+                onClick={() => handleOpenResume(resume.id)}
                 className="bg-slate-700/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-600/20 hover:bg-slate-700/50 hover:border-purple-500/30 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-6">
