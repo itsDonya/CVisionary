@@ -88,13 +88,14 @@ export const CreativeTemplate: React.FC<CreativeTemplateProps> = ({
                     {skill.category}
                   </h4>
                   <div className="space-y-1">
-                    {skill.items.map((item, i) => (
-                      <div key={i} className="text-xs">
-                        <span className="bg-purple-500 text-white px-2 py-1 rounded-full">
-                          {item}
-                        </span>
-                      </div>
-                    ))}
+                    {skill?.items?.length &&
+                      skill.items.map((item, i) => (
+                        <div key={i} className="text-xs">
+                          <span className="bg-purple-500 text-white px-2 py-1 rounded-full">
+                            {item}
+                          </span>
+                        </div>
+                      ))}
                   </div>
                 </div>
               ))}
