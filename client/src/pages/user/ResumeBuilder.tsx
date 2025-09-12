@@ -11,16 +11,24 @@ import {
   Save,
   Award,
   Palette,
+  Eye,
+  Download,
+  Settings,
 } from "lucide-react";
+import { Button, IconButton, Tooltip } from "@mui/material";
 import { useAppStore } from "@/stores/appStore";
+import { useTemplateStore } from "@/stores/templateStore";
+import { useResumeExport } from "@/hooks/useResumeExport";
 
-// steps
+// components
 import PersonalInfoStep from "@/components/user/resume-builder/PersonalInfoStep";
 import ExperienceStep from "@/components/user/resume-builder/ExperienceStep";
 import EducationStep from "@/components/user/resume-builder/EducationStep";
 import SkillsStep from "@/components/user/resume-builder/SkillsStep";
 import AchievementStep from "@/components/user/resume-builder/AchievementStep";
 import TemplateStep from "@/components/user/resume-builder/TemplateStep";
+import PreviewPanel from "@/components/user/resume-builder/PreviewPanel";
+import TemplateCustomizer from "@/components/user/resume-builder/TemplateCustomizer";
 
 const steps = [
   {
@@ -39,7 +47,7 @@ const steps = [
     id: "achievement",
     title: "Achievement",
     icon: Award,
-    description: "Proessional Achievements",
+    description: "Professional Achievements",
   },
   {
     id: "education",
@@ -73,8 +81,13 @@ const ResumeBuilder = () => {
     error,
   } = useAppStore();
 
+  const { selectedTemplateId, getSelectedTemplate } = useTemplateStore();
+  const { exportResume, isExporting, exportError } = useResumeExport();
+
   const [activeStep, setActiveStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [showCustomizer, setShowCustomizer] = useState(false);
 
   useEffect(() => {
     if (id && id !== "create") {
@@ -83,6 +96,8 @@ const ResumeBuilder = () => {
       createResume();
     }
   }, [id, loadResume, createResume]);
+
+  const selectedTemplate = getSelectedTemplate();
 
   const handleNext = () => {
     if (activeStep < steps.length - 1) {
@@ -100,7 +115,7 @@ const ResumeBuilder = () => {
     setIsSaving(true);
     try {
       await saveCurrentResume();
-      // show success message here
+      // Show success message
     } catch (error) {
       console.error("Failed to save resume:", error);
     } finally {
@@ -110,6 +125,10 @@ const ResumeBuilder = () => {
 
   const handleStepClick = (stepIndex: number) => {
     setActiveStep(stepIndex);
+  };
+
+  const handleExport = (format: "pdf" | "html" | "json") => {
+    exportResume(format);
   };
 
   const renderStepContent = () => {
@@ -154,9 +173,9 @@ const ResumeBuilder = () => {
           </h2>
           <p className="text-slate-400">{error}</p>
           <button
-            onClick={() => navigate("/panel/resumes")}
+            onClick={() => navigate("/panel")}
             className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
-            Back to Resumes
+            Back to Dashboard
           </button>
         </div>
       </div>
@@ -165,132 +184,248 @@ const ResumeBuilder = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <div className="bg-gradient-to-r from-purple-500/10 to-cyan-400/10 backdrop-blur-sm rounded-2xl border border-purple-500/20 p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500/20 to-cyan-400/20 rounded-xl border border-purple-500/30">
-              <FileText className="w-6 h-6 text-purple-400" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                {currentResume.title || "New Resume"}
-              </h1>
-              <p className="text-slate-400 text-sm">
-                Step {activeStep + 1} of {steps.length} -{" "}
-                {steps[activeStep].description}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => {
-              const StepIcon = step.icon;
-              const isActive = index === activeStep;
-              const isCompleted = index < activeStep;
-
-              return (
-                <div key={step.id} className="flex items-center flex-1">
-                  <div
-                    className="flex flex-col items-center cursor-pointer group"
-                    onClick={() => handleStepClick(index)}>
-                    <div
-                      className={`
-                      relative w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all duration-200
-                      ${
-                        isActive
-                          ? "bg-gradient-to-br from-purple-500 to-cyan-400 border-transparent text-white shadow-lg scale-110"
-                          : isCompleted
-                          ? "bg-gradient-to-br from-green-500/20 to-emerald-400/20 border-green-500/50 text-green-400"
-                          : "bg-slate-700/50 border-slate-600/30 text-slate-400 group-hover:border-purple-500/50 group-hover:text-purple-400"
-                      }
-                    `}>
-                      <StepIcon className="w-5 h-5" />
-                      {isActive && (
-                        <div className="absolute -inset-1 bg-gradient-to-br from-purple-500/20 to-cyan-400/20 rounded-xl blur-sm"></div>
-                      )}
-                    </div>
-
-                    <div className="mt-2 text-center">
-                      <p
-                        className={`text-sm font-medium transition-colors ${
-                          isActive
-                            ? "text-white"
-                            : "text-slate-400 group-hover:text-slate-300"
-                        }`}>
-                        {step.title}
-                      </p>
-                    </div>
+      <div className="flex">
+        {/* Main Content */}
+        <div
+          className={`transition-all duration-300 ${
+            showPreview ? "w-1/2" : "w-full"
+          }`}>
+          <div className="max-w-4xlss wf-ull mx-auto px-4 py-6 space-y-6">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-500/10 to-cyan-400/10 backdrop-blur-sm rounded-2xl border border-purple-500/20 p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-cyan-400/20 rounded-xl border border-purple-500/30">
+                    <FileText className="w-6 h-6 text-purple-400" />
                   </div>
+                  <div>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                      {currentResume.title || "New Resume"}
+                    </h1>
+                    <p className="text-slate-400 text-sm">
+                      Step {activeStep + 1} of {steps.length} -{" "}
+                      {steps[activeStep].description}
+                    </p>
+                  </div>
+                </div>
 
-                  {index < steps.length - 1 && (
-                    <div className="flex-1 h-0.5 mx-4 relative">
-                      <div className="absolute inset-0 bg-slate-700/30 rounded-full"></div>
-                      {index < activeStep && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full"></div>
-                      )}
-                    </div>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
+                  {selectedTemplate && (
+                    <>
+                      <Tooltip title="Customize Template">
+                        <IconButton
+                          onClick={() => setShowCustomizer(true)}
+                          sx={{ color: "white" }}>
+                          <Settings className="w-4 h-4" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Toggle Preview">
+                        <IconButton
+                          onClick={() => setShowPreview(!showPreview)}
+                          sx={{ color: "white" }}>
+                          <Eye className="w-4 h-4" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Button
+                        onClick={() => handleExport("pdf")}
+                        disabled={isExporting}
+                        startIcon={<Download className="w-4 h-4" />}
+                        sx={{
+                          minWidth: "auto",
+                          px: 2,
+                          py: 1,
+                          background:
+                            "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)",
+                          color: "white",
+                          fontSize: "0.75rem",
+                          "&:hover": {
+                            background:
+                              "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)",
+                          },
+                          "&:disabled": {
+                            opacity: 0.6,
+                          },
+                        }}>
+                        {isExporting ? "Exporting..." : "Export PDF"}
+                      </Button>
+                    </>
                   )}
                 </div>
-              );
-            })}
+              </div>
+            </div>
+
+            {/* Stepper */}
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
+              <div className="flex items-center justify-between mb-8">
+                {steps.map((step, index) => {
+                  const StepIcon = step.icon;
+                  const isActive = index === activeStep;
+                  const isCompleted = index < activeStep;
+
+                  return (
+                    <div key={step.id} className="flex items-center">
+                      <div
+                        className={`relative flex items-center cursor-pointer transition-all duration-300 ${
+                          isActive
+                            ? "scale-110"
+                            : "hover:scale-105 opacity-70 hover:opacity-100"
+                        }`}
+                        onClick={() => handleStepClick(index)}>
+                        <div
+                          className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all duration-300 ${
+                            isActive
+                              ? "bg-gradient-to-br from-purple-500/20 to-cyan-400/20 border-purple-500/50 text-white shadow-lg shadow-purple-500/25"
+                              : isCompleted
+                              ? "bg-gradient-to-br from-green-500/20 to-emerald-400/20 border-green-500/50 text-green-400"
+                              : "bg-slate-700/50 border-slate-600/50 text-slate-400 hover:border-slate-500/50"
+                          }`}>
+                          <StepIcon className="w-5 h-5" />
+                        </div>
+                        <div className="ml-3">
+                          <h3
+                            className={`font-medium text-sm transition-colors duration-300 ${
+                              isActive
+                                ? "text-white"
+                                : isCompleted
+                                ? "text-green-400"
+                                : "text-slate-400"
+                            }`}>
+                            {step.title}
+                          </h3>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {step.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Connecting Line */}
+                      {index < steps.length - 1 && (
+                        <div className="flex-1 h-px mx-4">
+                          <div
+                            className={`h-full transition-all duration-500 ${
+                              index < activeStep
+                                ? "bg-gradient-to-r from-green-500 to-green-400"
+                                : "bg-slate-700"
+                            }`}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Step Content */}
+              <div className="min-h-[400px]">{renderStepContent()}</div>
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-700/50">
+                <Button
+                  onClick={handleBack}
+                  disabled={activeStep === 0}
+                  startIcon={<ChevronLeft className="w-4 h-4" />}
+                  sx={{
+                    px: 3,
+                    py: 1.5,
+                    borderRadius: 2,
+                    color: activeStep === 0 ? "#64748b" : "white",
+                    borderColor:
+                      activeStep === 0 ? "#64748b" : "rgba(255,255,255,0.3)",
+                    "&:hover": {
+                      borderColor:
+                        activeStep === 0 ? "#64748b" : "rgba(255,255,255,0.5)",
+                      backgroundColor:
+                        activeStep === 0
+                          ? "transparent"
+                          : "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                  variant="outlined">
+                  Previous
+                </Button>
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    startIcon={<Save className="w-4 h-4" />}
+                    sx={{
+                      px: 3,
+                      py: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: "#374151",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#4b5563",
+                        transform: "translateY(-1px)",
+                      },
+                      "&:disabled": {
+                        opacity: 0.6,
+                      },
+                    }}>
+                    {isSaving ? "Saving..." : "Save Draft"}
+                  </Button>
+
+                  <Button
+                    onClick={handleNext}
+                    disabled={activeStep === steps.length - 1}
+                    endIcon={<ChevronRight className="w-4 h-4" />}
+                    sx={{
+                      px: 4,
+                      py: 1.5,
+                      borderRadius: 2,
+                      background:
+                        activeStep === steps.length - 1
+                          ? "#374151"
+                          : "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)",
+                      color: "white",
+                      "&:hover":
+                        activeStep === steps.length - 1
+                          ? {}
+                          : {
+                              background:
+                                "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)",
+                              transform: "translateY(-1px)",
+                              boxShadow: "0 10px 25px rgba(139, 92, 246, 0.3)",
+                            },
+                      transition: "all 0.2s ease",
+                    }}>
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Export Error */}
+            {exportError && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+                <p className="text-red-400 text-sm">{exportError}</p>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 min-h-[600px]">
-          {renderStepContent()}
-        </div>
-
-        <div className="flex items-center justify-between bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
-          <button
-            onClick={handleBack}
-            disabled={activeStep === 0}
-            className={`
-              flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200
-              ${
-                activeStep === 0
-                  ? "bg-slate-700/30 text-slate-500 cursor-not-allowed"
-                  : "bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
-              }
-            `}>
-            <ChevronLeft className="w-4 h-4" />
-            Previous
-          </button>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200
-                ${
-                  isSaving
-                    ? "bg-slate-700/50 text-slate-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 to-cyan-400 text-white hover:from-purple-600 hover:to-cyan-500 shadow-lg hover:shadow-purple-500/25"
-                }
-              `}>
-              <Save className="w-4 h-4" />
-              {isSaving ? "Saving..." : "Save Draft"}
-            </button>
+        {/* Preview Panel */}
+        {showPreview && (
+          <div className="w-1/2 border-l border-slate-700/50">
+            <div className="sticky top-0 h-screen overflow-auto">
+              <PreviewPanel className="h-full" />
+            </div>
           </div>
-
-          <button
-            onClick={handleNext}
-            disabled={activeStep === steps.length - 1}
-            className={`
-              flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200
-              ${
-                activeStep === steps.length - 1
-                  ? "bg-slate-700/30 text-slate-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-500 to-cyan-400 text-white hover:from-purple-600 hover:to-cyan-500 shadow-lg hover:shadow-purple-500/25"
-              }
-            `}>
-            {activeStep === steps.length - 1 ? "Finish" : "Next"}
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
+        )}
       </div>
+
+      {/* Template Customizer Dialog */}
+      {selectedTemplate && (
+        <TemplateCustomizer
+          open={showCustomizer}
+          onClose={() => setShowCustomizer(false)}
+          templateId={selectedTemplate.id}
+        />
+      )}
     </div>
   );
 };
