@@ -15,24 +15,44 @@ export class ResumeExporter {
 
   async exportToPDF(): Promise<Blob> {
     try {
-      // Create a temporary element with the resume content
-      const tempElement = await this.createTemplateElement();
-      document.body.appendChild(tempElement);
+      const previewElement = document.getElementById("resume-preview");
 
-      // Generate canvas from HTML
-      const canvas = await html2canvas(tempElement, {
-        scale: 2,
+      if (!previewElement) {
+        throw new Error("Preview element not found");
+      }
+
+      // تنظیمات خیلی محافظه‌کارانه
+      const canvas = await html2canvas(previewElement, {
+        scale: 1.5, // کمتر کردیم
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         backgroundColor: "#ffffff",
-        width: 794, // A4 width in pixels (at 96 DPI)
-        height: 1123, // A4 height in pixels (at 96 DPI)
+        logging: false,
+        foreignObjectRendering: false,
+        // فقط محتوای ساده
+        onclone: (clonedDoc) => {
+          // تمام gradient ها و CSS مدرن رو حذف کن
+          const allElements = clonedDoc.getElementsByTagName("*");
+          for (let element of Array.from(allElements)) {
+            if (element instanceof HTMLElement) {
+              const style = element.style;
+
+              // هر چیزی که oklch داره رو پاک کن
+              for (let prop of Array.from(style)) {
+                if (style.getPropertyValue(prop).includes("oklch")) {
+                  style.removeProperty(prop);
+                }
+              }
+
+              // رنگ‌های ساده بذار
+              if (element.classList.contains("bg-gradient-to-r")) {
+                element.style.background = "#8b5cf6";
+              }
+            }
+          }
+        },
       });
 
-      // Remove temporary element
-      document.body.removeChild(tempElement);
-
-      // Create PDF
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -40,50 +60,152 @@ export class ResumeExporter {
       });
 
       const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Add additional pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
 
       return pdf.output("blob");
     } catch (error) {
       console.error("PDF export failed:", error);
-      throw new Error("Failed to export PDF");
+      throw new Error(`PDF Export Error: ${error}`);
     }
+  }
+
+  // المنت کلون شده با استایل‌های ساده
+  private createCleanElement(element: HTMLElement): HTMLElement {
+    const cloned = element.cloneNode(true) as HTMLElement;
+
+    // استایل‌های inline مشکل‌دار رو پاک کن
+    this.cleanModernCSS(cloned);
+
+    // استایل‌های ساده اضافه کن
+    cloned.style.cssText = `
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 794px;
+      min-height: 1123px;
+      background: white;
+      font-family: Arial, sans-serif;
+      color: #333;
+      padding: 0;
+      margin: 0;
+    `;
+
+    return cloned;
+  }
+
+  private cleanModernCSS(element: HTMLElement): void {
+    // تمام المنت‌ها و فرزندانشون رو پاک کن
+    const walkElements = (el: HTMLElement) => {
+      // استایل‌های مشکل‌دار رو حذف کن
+      const style = el.style;
+
+      // oklch, hsl(), rgb() مدرن و ... رو با رنگ‌های ساده جایگزین کن
+      if (
+        style.backgroundColor &&
+        (style.backgroundColor.includes("oklch") ||
+          style.backgroundColor.includes("hsl") ||
+          style.backgroundColor.includes("rgb"))
+      ) {
+        if (
+          style.backgroundColor.includes("purple") ||
+          style.backgroundColor.includes("violet")
+        ) {
+          style.backgroundColor = "#8b5cf6";
+        } else if (style.backgroundColor.includes("blue")) {
+          style.backgroundColor = "#3b82f6";
+        } else if (
+          style.backgroundColor.includes("gray") ||
+          style.backgroundColor.includes("slate")
+        ) {
+          style.backgroundColor = "#6b7280";
+        } else {
+          style.backgroundColor = "#ffffff";
+        }
+      }
+
+      if (
+        style.color &&
+        (style.color.includes("oklch") ||
+          style.color.includes("hsl") ||
+          style.color.includes("rgb"))
+      ) {
+        style.color = "#333333";
+      }
+
+      // gradient ها رو ساده کن
+      if (style.background && style.background.includes("gradient")) {
+        if (style.background.includes("purple")) {
+          style.background = "#8b5cf6";
+        } else if (style.background.includes("blue")) {
+          style.background = "#3b82f6";
+        } else {
+          style.background = "#ffffff";
+        }
+      }
+
+      // backdrop-filter رو حذف کن
+      if (style.backdropFilter) {
+        style.backdropFilter = "none";
+      }
+
+      // CSS custom properties رو حذف کن
+      Array.from(style).forEach((prop) => {
+        if (prop.startsWith("--")) {
+          style.removeProperty(prop);
+        }
+      });
+
+      // فرزندان رو هم پردازش کن
+      Array.from(el.children).forEach((child) => {
+        if (child instanceof HTMLElement) {
+          walkElements(child);
+        }
+      });
+    };
+
+    walkElements(element);
   }
 
   async exportToHTML(): Promise<string> {
     try {
-      const tempElement = await this.createTemplateElement();
+      const previewElement = document.getElementById("resume-preview");
+
+      if (!previewElement) {
+        throw new Error("Preview element not found");
+      }
+
+      const resumeElement =
+        previewElement.querySelector(".resume-template") ||
+        previewElement.querySelector(".creative-template") ||
+        previewElement.querySelector("[data-template-id]") ||
+        previewElement;
+
+      if (!resumeElement) {
+        throw new Error("Resume template element not found");
+      }
+
+      // المنت کلین شده
+      const cleanElement = this.createCleanElement(
+        resumeElement as HTMLElement
+      );
+
       const html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${this.resume.personalInfo?.firstName} ${
-        this.resume.personalInfo?.lastName
-      } - Resume</title>
+          <title>${this.resume.personalInfo?.firstName || "Resume"} ${
+        this.resume.personalInfo?.lastName || ""
+      }</title>
           <style>
-            ${this.getTemplateCSS()}
+            ${this.getBaseCSS()}
           </style>
         </head>
         <body>
-          ${tempElement.outerHTML}
+          <div class="resume-container">
+            ${cleanElement.outerHTML}
+          </div>
         </body>
         </html>
       `;
@@ -112,167 +234,7 @@ export class ResumeExporter {
     }
   }
 
-  private async createTemplateElement(): Promise<HTMLElement> {
-    // This would normally create the actual template element
-    // For now, we'll create a placeholder
-    const element = document.createElement("div");
-    element.style.width = "794px";
-    element.style.minHeight = "1123px";
-    element.style.backgroundColor = "white";
-    element.style.padding = "40px";
-    element.style.fontFamily = "Arial, sans-serif";
-    element.style.position = "absolute";
-    element.style.left = "-9999px";
-    element.style.top = "0";
-
-    // Add resume content based on template
-    element.innerHTML = this.generateTemplateHTML();
-
-    return element;
-  }
-
-  private generateTemplateHTML(): string {
-    // Generate HTML based on template type
-    switch (this.template.id) {
-      case "template-1":
-        return this.generateModernHTML();
-      case "template-2":
-        return this.generateClassicHTML();
-      case "template-3":
-        return this.generateCreativeHTML();
-      case "template-4":
-        return this.generateMinimalHTML();
-      default:
-        return this.generateModernHTML();
-    }
-  }
-
-  private generateModernHTML(): string {
-    return `
-      <div class="modern-resume">
-        <header style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 2rem; margin-bottom: 2rem;">
-          <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700;">
-            ${this.resume.personalInfo?.firstName || ""} ${
-      this.resume.personalInfo?.lastName || ""
-    }
-          </h1>
-          <h2 style="font-size: 1.25rem; margin-bottom: 1rem; opacity: 0.9;">
-            ${this.resume.personalInfo?.title || ""}
-          </h2>
-          <div style="display: flex; gap: 1.5rem; font-size: 0.875rem;">
-            ${
-              this.resume.personalInfo?.email
-                ? `<span>📧 ${this.resume.personalInfo.email}</span>`
-                : ""
-            }
-            ${
-              this.resume.personalInfo?.phone
-                ? `<span>📱 ${this.resume.personalInfo.phone}</span>`
-                : ""
-            }
-            ${
-              this.resume.personalInfo?.location
-                ? `<span>📍 ${this.resume.personalInfo.location}</span>`
-                : ""
-            }
-          </div>
-        </header>
-        
-        ${
-          this.resume.personalInfo?.summary
-            ? `
-        <section style="margin-bottom: 2rem;">
-          <h3 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem;">
-            Professional Summary
-          </h3>
-          <p style="color: #4b5563; line-height: 1.6;">${this.resume.personalInfo.summary}</p>
-        </section>
-        `
-            : ""
-        }
-        
-        ${
-          this.resume.experiences && this.resume.experiences.length > 0
-            ? `
-        <section style="margin-bottom: 2rem;">
-          <h3 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem;">
-            Professional Experience
-          </h3>
-          ${this.resume.experiences
-            .map(
-              (exp) => `
-            <div style="margin-bottom: 1.5rem; border-left: 4px solid #dbeafe; padding-left: 1.5rem;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                <div>
-                  <h4 style="font-size: 1.25rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
-                    ${exp.position}
-                  </h4>
-                  <p style="color: #2563eb; font-weight: 500; margin-bottom: 0.25rem;">
-                    ${exp.company}
-                  </p>
-                  ${
-                    exp.location
-                      ? `<p style="color: #6b7280; font-size: 0.875rem;">${exp.location}</p>`
-                      : ""
-                  }
-                </div>
-                <div style="text-align: right; color: #6b7280; font-size: 0.875rem;">
-                  <p style="font-weight: 500;">
-                    ${exp.startDate} - ${
-                exp.isCurrentJob ? "Present" : exp.endDate
-              }
-                  </p>
-                </div>
-              </div>
-              ${
-                exp.description
-                  ? `<p style="color: #4b5563; margin-bottom: 0.75rem; line-height: 1.6;">${exp.description}</p>`
-                  : ""
-              }
-              ${
-                exp.achievements && exp.achievements.length > 0
-                  ? `
-                <ul style="list-style-type: disc; margin-left: 1.25rem; color: #4b5563;">
-                  ${exp.achievements
-                    .map(
-                      (achievement) =>
-                        `<li style="margin-bottom: 0.25rem;">${achievement}</li>`
-                    )
-                    .join("")}
-                </ul>
-              `
-                  : ""
-              }
-            </div>
-          `
-            )
-            .join("")}
-        </section>
-        `
-            : ""
-        }
-        
-        <!-- Add more sections as needed -->
-      </div>
-    `;
-  }
-
-  private generateClassicHTML(): string {
-    // Implementation for classic template
-    return "<div>Classic Template HTML</div>";
-  }
-
-  private generateCreativeHTML(): string {
-    // Implementation for creative template
-    return "<div>Creative Template HTML</div>";
-  }
-
-  private generateMinimalHTML(): string {
-    // Implementation for minimal template
-    return "<div>Minimal Template HTML</div>";
-  }
-
-  private getTemplateCSS(): string {
+  private getBaseCSS(): string {
     return `
       * {
         box-sizing: border-box;
@@ -284,23 +246,49 @@ export class ResumeExporter {
         font-family: Arial, sans-serif;
         line-height: 1.6;
         color: #333;
+        background: #f5f5f5;
+        padding: 20px;
       }
       
-      .modern-resume {
-        max-width: 794px;
+      .resume-container {
+        max-width: 210mm;
         margin: 0 auto;
         background: white;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
       }
+
+      /* رنگ‌های ساده برای جایگزینی */
+      .bg-purple-600 { background-color: #8b5cf6 !important; }
+      .bg-blue-600 { background-color: #3b82f6 !important; }
+      .text-purple-600 { color: #8b5cf6 !important; }
+      .text-blue-600 { color: #3b82f6 !important; }
+      .text-gray-800 { color: #1f2937 !important; }
+      .text-gray-700 { color: #374151 !important; }
+      .text-gray-600 { color: #4b5563 !important; }
+      .text-gray-500 { color: #6b7280 !important; }
       
       @media print {
-        body { margin: 0; }
-        .modern-resume { box-shadow: none; }
+        body { 
+          margin: 0; 
+          padding: 0;
+          background: white;
+        }
+        .resume-container { 
+          box-shadow: none; 
+          margin: 0;
+          max-width: none;
+        }
+      }
+      
+      @page {
+        size: A4;
+        margin: 0;
       }
     `;
   }
 }
 
-// Helper function to download files
+// Helper function
 export const downloadFile = (
   blob: Blob,
   filename: string,

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAppStore } from "@/stores/appStore";
 import { useTemplateStore } from "@/stores/templateStore";
+import { useResumeExport } from "@/hooks/useResumeExport";
 import { BaseTemplate } from "./templates/BaseTemplate";
 import { Button, IconButton, Tooltip } from "@mui/material";
 import { ZoomIn, ZoomOut, RotateCcw, Download, Settings } from "lucide-react";
@@ -12,8 +13,8 @@ interface PreviewPanelProps {
 const PreviewPanel: React.FC<PreviewPanelProps> = ({ className = "" }) => {
   const { currentResume } = useAppStore();
   const { getSelectedTemplate, selectedTemplateId } = useTemplateStore();
+  const { exportResume, isExporting, exportError } = useResumeExport();
   const [zoom, setZoom] = useState(1);
-  const [isExporting, setIsExporting] = useState(false);
 
   const selectedTemplate = useMemo(() => {
     return getSelectedTemplate();
@@ -31,18 +32,8 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ className = "" }) => {
     setZoom(1);
   };
 
-  const handleExport = async () => {
-    if (!selectedTemplate) return;
-
-    setIsExporting(true);
-    try {
-      // اینجا منطق export اضافه کنید
-      console.log("Exporting resume with template:", selectedTemplate.id);
-    } catch (error) {
-      console.error("Export failed:", error);
-    } finally {
-      setIsExporting(false);
-    }
+  const handleExport = async (format: "pdf" | "html" | "json") => {
+    await exportResume(format);
   };
 
   if (!selectedTemplate) {
@@ -113,34 +104,83 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ className = "" }) => {
             </Tooltip>
           </div>
 
-          {/* Export Button */}
-          <Button
-            onClick={handleExport}
-            disabled={isExporting}
-            startIcon={<Download className="w-4 h-4" />}
-            sx={{
-              minWidth: "auto",
-              px: 2,
-              py: 1,
-              background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)",
-              color: "white",
-              fontSize: "0.75rem",
-              "&:hover": {
-                background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)",
-              },
-              "&:disabled": {
-                opacity: 0.6,
-              },
-            }}>
-            {isExporting ? "Exporting..." : "Export"}
-          </Button>
+          {/* Export Buttons */}
+          <div className="flex gap-1">
+            <Button
+              onClick={() => handleExport("pdf")}
+              disabled={isExporting}
+              startIcon={<Download className="w-4 h-4" />}
+              sx={{
+                minWidth: "auto",
+                px: 2,
+                py: 1,
+                background: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
+                color: "white",
+                fontSize: "0.75rem",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)",
+                },
+                "&:disabled": { opacity: 0.6 },
+              }}>
+              {isExporting ? "..." : "PDF"}
+            </Button>
+
+            <Button
+              onClick={() => handleExport("html")}
+              disabled={isExporting}
+              startIcon={<Download className="w-4 h-4" />}
+              sx={{
+                minWidth: "auto",
+                px: 2,
+                py: 1,
+                background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+                color: "white",
+                fontSize: "0.75rem",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+                },
+                "&:disabled": { opacity: 0.6 },
+              }}>
+              HTML
+            </Button>
+
+            <Button
+              onClick={() => handleExport("json")}
+              disabled={isExporting}
+              startIcon={<Download className="w-4 h-4" />}
+              sx={{
+                minWidth: "auto",
+                px: 2,
+                py: 1,
+                background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
+                color: "white",
+                fontSize: "0.75rem",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #047857 0%, #059669 100%)",
+                },
+                "&:disabled": { opacity: 0.6 },
+              }}>
+              JSON
+            </Button>
+          </div>
         </div>
       </div>
 
+      {/* Export Error */}
+      {exportError && (
+        <div className="mx-4 mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs">
+          {exportError}
+        </div>
+      )}
+
       {/* Preview Content */}
-      <div className="p-4">
+      <div className="p-4 bg-gray-100">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div
+            id="resume-preview" // 🎯 این ID خیلی مهمه!
             style={{
               transform: `scale(${zoom})`,
               transformOrigin: "top left",
