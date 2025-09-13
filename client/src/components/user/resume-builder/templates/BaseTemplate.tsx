@@ -19,21 +19,22 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
 
   return (
     <div
-      className={`resume-template ${className}`}
-      data-template-id={template?.id}
+      id="resume-preview"
+      className={`resume-template bg-white text-black min-h-screen w-full max-w-none ${className}`}
       style={{
-        backgroundColor: "#ffffff",
-        color: "#000000",
-        padding: "32px",
-        minHeight: "297mm",
         width: "210mm",
-        maxWidth: "210mm",
+        minHeight: "297mm",
+        padding: "20mm",
         margin: "0 auto",
-        fontFamily: '"Inter", "Segoe UI", sans-serif',
-        fontSize: "14px",
+        boxSizing: "border-box",
+        backgroundColor: "#ffffff",
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        fontSize: "12px",
         lineHeight: "1.6",
-        boxShadow: isPreview ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "none",
-      }}>
+        color: "#000000",
+        overflow: "visible",
+      }}
+      data-template-id={template?.id}>
       {/* Header */}
       <div
         style={{

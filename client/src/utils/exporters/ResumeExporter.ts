@@ -3,24 +3,22 @@ import jsPDF from "jspdf";
 
 export class ResumeExporter {
   private static readonly PDF_CONFIG = {
-    format: "a4" as const,
     orientation: "portrait" as const,
     unit: "mm" as const,
+    format: "a4" as const,
     compress: true,
+    precision: 2,
   };
 
   private static readonly CANVAS_CONFIG = {
-    scale: 3,
+    scale: 3, // افزایش scale برای کیفیت بهتر
     useCORS: true,
     allowTaint: false,
     backgroundColor: "#ffffff",
-    logging: false,
-    width: 794,
-    height: 1123,
-    scrollX: 0,
-    scrollY: 0,
-    windowWidth: 794,
-    windowHeight: 1123,
+    logging: true, // فعال کردن logging برای debug
+    removeContainer: true,
+    imageTimeout: 0,
+    foreignObjectRendering: false,
   };
 
   static async exportToPDF(): Promise<void> {
@@ -32,20 +30,39 @@ export class ResumeExporter {
         throw new Error("عنصر resume-preview یافت نشد");
       }
 
-      // ایجاد کپی از element با تمام styles
-      const clonedElement = await this.createStyledClone(element);
+      // مخفی کردن scroll bars
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
 
-      // اضافه کردن clone به DOM موقتاً
+      // ایجاد کپی optimized
+      const clonedElement = await this.createOptimizedClone(element);
+
+      // اضافه کردن به DOM
       document.body.appendChild(clonedElement);
 
-      // تولید canvas از clone
-      const canvas = await html2canvas(clonedElement, this.CANVAS_CONFIG);
+      // صبر برای render کامل
+      await this.waitForRender();
 
-      // حذف clone از DOM
+      // محاسبه ابعاد دقیق
+      const dimensions = this.calculateOptimalDimensions(clonedElement);
+
+      console.log("📊 Calculated dimensions:", dimensions);
+
+      // تولید canvas با ابعاد محاسبه شده
+      const canvas = await html2canvas(clonedElement, {
+        ...this.CANVAS_CONFIG,
+        width: dimensions.width,
+        height: dimensions.height,
+        windowWidth: dimensions.width,
+        windowHeight: dimensions.height,
+      });
+
+      // حذف clone
       document.body.removeChild(clonedElement);
+      document.body.style.overflow = originalOverflow;
 
       // تولید PDF
-      await this.generatePDFFromCanvas(canvas);
+      await this.generateOptimizedPDF(canvas);
 
       console.log("✅ PDF با موفقیت تولید شد");
     } catch (error) {
@@ -54,395 +71,236 @@ export class ResumeExporter {
     }
   }
 
-  private static async createStyledClone(
+  private static async createOptimizedClone(
     element: HTMLElement
   ): Promise<HTMLElement> {
-    // کپی کردن element
     const clone = element.cloneNode(true) as HTMLElement;
 
-    // تنظیمات کلی clone
+    // تنظیمات بهینه برای clone
     clone.style.position = "absolute";
-    clone.style.left = "-9999px";
+    clone.style.left = "-10000px";
     clone.style.top = "0";
-    clone.style.width = "794px";
-    clone.style.minHeight = "1123px";
-    clone.style.maxWidth = "none";
+    clone.style.width = "210mm"; // عرض A4
+    clone.style.minHeight = "auto";
+    clone.style.maxWidth = "210mm";
     clone.style.margin = "0";
-    clone.style.padding = "0";
+    clone.style.padding = "20mm"; // padding مناسب
     clone.style.backgroundColor = "#ffffff";
-    clone.style.fontFamily = "'Inter', 'Segoe UI', sans-serif";
-    clone.style.fontSize = "14px";
-    clone.style.lineHeight = "1.5";
-    clone.style.color = "#000000";
+    clone.style.boxSizing = "border-box";
+    clone.style.overflow = "visible";
     clone.style.transform = "none";
     clone.style.boxShadow = "none";
+    clone.style.border = "none";
+    clone.style.outline = "none";
 
-    // اعمال styles به تمام elements
-    await this.applyComputedStylesToClone(element, clone);
+    // تنظیمات فونت
+    clone.style.fontFamily =
+      "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    clone.style.fontSize = "12px";
+    clone.style.lineHeight = "1.6";
+    clone.style.color = "#000000";
+    clone.style.fontSmoothing = "antialiased";
+    clone.style.webkitFontSmoothing = "antialiased";
+
+    // حذف تمام انیمیشن‌ها و transition ها
+    const allElements = clone.querySelectorAll("*");
+    allElements.forEach((el: Element) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.animation = "none";
+      htmlEl.style.transition = "none";
+      htmlEl.style.transform = "none";
+      htmlEl.style.boxShadow = "none";
+    });
+
+    // بهینه‌سازی تصاویر
+    const images = clone.querySelectorAll("img");
+    for (const img of images) {
+      if (img.src) {
+        try {
+          await this.preloadImage(img.src);
+        } catch (error) {
+          console.warn("خطا در بارگذاری تصویر:", img.src);
+        }
+      }
+    }
 
     return clone;
   }
 
-  private static async applyComputedStylesToClone(
-    original: HTMLElement,
-    clone: HTMLElement
-  ): Promise<void> {
-    // اعمال style به element اصلی
-    const originalStyle = window.getComputedStyle(original);
-    this.copyComputedStyle(originalStyle, clone, original);
+  private static calculateOptimalDimensions(element: HTMLElement): {
+    width: number;
+    height: number;
+  } {
+    // محاسبه ابعاد بر اساس محتوا
+    const rect = element.getBoundingClientRect();
+    const scrollWidth = element.scrollWidth;
+    const scrollHeight = element.scrollHeight;
 
-    // اعمال styles به child elements
-    const originalChildren = original.querySelectorAll("*");
-    const cloneChildren = clone.querySelectorAll("*");
+    // تبدیل mm به px (96 DPI)
+    const mmToPx = (mm: number) => Math.round(mm * 3.7795275591);
 
-    for (let i = 0; i < originalChildren.length; i++) {
-      const originalChild = originalChildren[i] as HTMLElement;
-      const cloneChild = cloneChildren[i] as HTMLElement;
+    const a4WidthPx = mmToPx(210); // 794px
+    const a4HeightPx = mmToPx(297); // 1123px
 
-      if (originalChild && cloneChild) {
-        const childStyle = window.getComputedStyle(originalChild);
-        this.copyComputedStyle(childStyle, cloneChild, originalChild);
-      }
-    }
+    return {
+      width: Math.max(scrollWidth, a4WidthPx),
+      height: Math.max(scrollHeight, a4HeightPx),
+    };
   }
 
-  private static copyComputedStyle(
-    computedStyle: CSSStyleDeclaration,
-    targetElement: HTMLElement,
-    sourceElement: HTMLElement
-  ): void {
-    const tagName = targetElement.tagName.toLowerCase();
-    const className = sourceElement.className || "";
-
-    // استایل‌های اساسی
-    const importantStyles = [
-      "backgroundColor",
-      "color",
-      "fontFamily",
-      "fontSize",
-      "fontWeight",
-      "lineHeight",
-      "textAlign",
-      "padding",
-      "margin",
-      "border",
-      "borderRadius",
-      "width",
-      "height",
-      "display",
-      "position",
-      "textDecoration",
-      "textTransform",
-      "letterSpacing",
-    ];
-
-    // کپی کردن استایل‌های مهم
-    importantStyles.forEach((property) => {
-      const value = computedStyle.getPropertyValue(this.camelToKebab(property));
-      if (value && value !== "auto" && value !== "normal") {
-        targetElement.style.setProperty(
-          this.camelToKebab(property),
-          value,
-          "important"
-        );
-      }
-    });
-
-    // اصلاحات خاص برای Modern Template
-    if (
-      className.includes("modern-template") ||
-      sourceElement.closest(".modern-template")
-    ) {
-      this.applyModernTemplateStyles(
-        targetElement,
-        className,
-        tagName,
-        computedStyle
-      );
-    }
-
-    // اصلاح backgrounds شفاف
-    if (
-      computedStyle.backgroundColor === "rgba(0, 0, 0, 0)" ||
-      computedStyle.backgroundColor === "transparent"
-    ) {
-      targetElement.style.setProperty(
-        "background-color",
-        "transparent",
-        "important"
-      );
-    }
-
-    // اصلاح gradients
-    const backgroundImage = computedStyle.backgroundImage;
-    if (backgroundImage && backgroundImage !== "none") {
-      targetElement.style.setProperty(
-        "background-image",
-        backgroundImage,
-        "important"
-      );
-    }
-  }
-
-  private static applyModernTemplateStyles(
-    element: HTMLElement,
-    className: string,
-    tagName: string,
-    computedStyle: CSSStyleDeclaration
-  ): void {
-    // Header gradient
-    if (tagName === "header" || className.includes("bg-gradient")) {
-      element.style.setProperty(
-        "background",
-        "linear-gradient(to right, #2563eb, #1d4ed8)",
-        "important"
-      );
-      element.style.setProperty("color", "#ffffff", "important");
-      element.style.setProperty("padding", "32px", "important");
-    }
-
-    // Blue elements
-    if (className.includes("border-blue-600")) {
-      element.style.setProperty("border-color", "#2563eb", "important");
-    }
-
-    if (className.includes("text-blue-600")) {
-      element.style.setProperty("color", "#2563eb", "important");
-    }
-
-    if (className.includes("bg-blue-100")) {
-      element.style.setProperty("background-color", "#dbeafe", "important");
-    }
-
-    if (className.includes("text-blue-800")) {
-      element.style.setProperty("color", "#1e40af", "important");
-    }
-
-    // Gray elements
-    if (className.includes("bg-gray-50")) {
-      element.style.setProperty("background-color", "#f9fafb", "important");
-    }
-
-    if (className.includes("text-gray-800")) {
-      element.style.setProperty("color", "#1f2937", "important");
-    }
-
-    if (className.includes("text-gray-700")) {
-      element.style.setProperty("color", "#374151", "important");
-    }
-
-    if (className.includes("text-gray-600")) {
-      element.style.setProperty("color", "#4b5563", "important");
-    }
-
-    // Borders
-    if (className.includes("border-l-4")) {
-      element.style.setProperty("border-left-width", "4px", "important");
-      element.style.setProperty("border-left-style", "solid", "important");
-    }
-
-    if (className.includes("border-b-2")) {
-      element.style.setProperty("border-bottom-width", "2px", "important");
-      element.style.setProperty("border-bottom-style", "solid", "important");
-    }
-
-    // Typography
-    if (className.includes("text-4xl")) {
-      element.style.setProperty("font-size", "2.25rem", "important");
-      element.style.setProperty("line-height", "2.5rem", "important");
-    }
-
-    if (className.includes("text-2xl")) {
-      element.style.setProperty("font-size", "1.5rem", "important");
-      element.style.setProperty("line-height", "2rem", "important");
-    }
-
-    if (className.includes("text-xl")) {
-      element.style.setProperty("font-size", "1.25rem", "important");
-      element.style.setProperty("line-height", "1.75rem", "important");
-    }
-
-    if (className.includes("font-bold")) {
-      element.style.setProperty("font-weight", "700", "important");
-    }
-
-    if (className.includes("font-semibold")) {
-      element.style.setProperty("font-weight", "600", "important");
-    }
-
-    if (className.includes("font-medium")) {
-      element.style.setProperty("font-weight", "500", "important");
-    }
-
-    // Spacing
-    if (className.includes("mb-8")) {
-      element.style.setProperty("margin-bottom", "32px", "important");
-    }
-
-    if (className.includes("mb-4")) {
-      element.style.setProperty("margin-bottom", "16px", "important");
-    }
-
-    if (className.includes("mb-2")) {
-      element.style.setProperty("margin-bottom", "8px", "important");
-    }
-
-    if (className.includes("p-8")) {
-      element.style.setProperty("padding", "32px", "important");
-    }
-
-    if (className.includes("px-3")) {
-      element.style.setProperty("padding-left", "12px", "important");
-      element.style.setProperty("padding-right", "12px", "important");
-    }
-
-    if (className.includes("py-1")) {
-      element.style.setProperty("padding-top", "4px", "important");
-      element.style.setProperty("padding-bottom", "4px", "important");
-    }
-
-    if (className.includes("pl-6")) {
-      element.style.setProperty("padding-left", "24px", "important");
-    }
-
-    if (className.includes("pb-2")) {
-      element.style.setProperty("padding-bottom", "8px", "important");
-    }
-
-    // Rounded corners
-    if (className.includes("rounded-lg")) {
-      element.style.setProperty("border-radius", "8px", "important");
-    }
-
-    if (className.includes("rounded")) {
-      element.style.setProperty("border-radius", "4px", "important");
-    }
-  }
-
-  private static camelToKebab(str: string): string {
-    return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-  }
-
-  private static async generatePDFFromCanvas(
+  private static async generateOptimizedPDF(
     canvas: HTMLCanvasElement
   ): Promise<void> {
-    const imgData = canvas.toDataURL("image/png", 1.0);
     const pdf = new jsPDF(this.PDF_CONFIG);
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    // ابعاد PDF در mm
+    const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
+    const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
 
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
+    // تبدیل canvas به base64
+    const imgData = canvas.toDataURL("image/png", 1.0);
 
-    const ratio = Math.min(
-      pdfWidth / (imgWidth * 0.75),
-      pdfHeight / (imgHeight * 0.75)
-    );
-    const scaledWidth = imgWidth * 0.75 * ratio;
-    const scaledHeight = imgHeight * 0.75 * ratio;
+    // محاسبه ابعاد بهینه
+    const canvasAspectRatio = canvas.width / canvas.height;
+    const pdfAspectRatio = pdfWidth / pdfHeight;
 
-    const imgX = (pdfWidth - scaledWidth) / 2;
-    const imgY = 0;
+    let finalWidth: number;
+    let finalHeight: number;
 
+    if (canvasAspectRatio > pdfAspectRatio) {
+      // canvas عریض‌تر است - fit به عرض
+      finalWidth = pdfWidth - 10; // 5mm margin از هر طرف
+      finalHeight = finalWidth / canvasAspectRatio;
+    } else {
+      // canvas بلندتر است - fit به ارتفاع
+      finalHeight = pdfHeight - 10; // 5mm margin از بالا و پایین
+      finalWidth = finalHeight * canvasAspectRatio;
+    }
+
+    // مرکز کردن در صفحه
+    const x = (pdfWidth - finalWidth) / 2;
+    const y = 5; // 5mm از بالا
+
+    console.log("📄 PDF Layout:", {
+      pdfWidth,
+      pdfHeight,
+      canvasWidth: canvas.width,
+      canvasHeight: canvas.height,
+      finalWidth,
+      finalHeight,
+      x,
+      y,
+    });
+
+    // اضافه کردن تصویر به PDF
     pdf.addImage(
       imgData,
       "PNG",
-      imgX,
-      imgY,
-      scaledWidth,
-      scaledHeight,
+      x,
+      y,
+      finalWidth,
+      finalHeight,
       undefined,
       "FAST"
     );
+
+    // اگر محتوا طولانی است، صفحات اضافی ایجاد کن
+    if (finalHeight > pdfHeight - 10) {
+      await this.handleMultiPageContent(
+        pdf,
+        canvas,
+        finalWidth,
+        pdfWidth,
+        pdfHeight
+      );
+    }
 
     const fileName = `resume-${Date.now()}.pdf`;
     pdf.save(fileName);
   }
 
-  static async exportToHTML(): Promise<void> {
-    try {
-      const element = document.getElementById("resume-preview");
-      if (!element) {
-        throw new Error("عنصر resume-preview یافت نشد");
-      }
+  private static async handleMultiPageContent(
+    pdf: jsPDF,
+    canvas: HTMLCanvasElement,
+    finalWidth: number,
+    pdfWidth: number,
+    pdfHeight: number
+  ): Promise<void> {
+    // برای محتوای طولانی، تقسیم به چند صفحه
+    const pageHeight = pdfHeight - 10; // با margin
+    const canvasHeight = canvas.height;
+    const scaleFactor = finalWidth / canvas.width;
+    const scaledCanvasHeight = canvasHeight * scaleFactor;
 
-      const htmlContent = `
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background: #f5f5f5; 
-            line-height: 1.5;
-        }
-        .resume-container { 
-            max-width: 794px; 
-            margin: 0 auto; 
-            background: white; 
-            min-height: 1123px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1); 
-        }
-        
-        /* Modern Template Styles */
-        .modern-template header {
-            background: linear-gradient(to right, #2563eb, #1d4ed8) !important;
-            color: white !important;
-            padding: 32px !important;
-        }
-        .border-blue-600 { border-color: #2563eb !important; }
-        .border-b-2 { border-bottom-width: 2px !important; border-bottom-style: solid !important; }
-        .border-l-4 { border-left-width: 4px !important; border-left-style: solid !important; }
-        .text-blue-600 { color: #2563eb !important; }
-        .text-blue-800 { color: #1e40af !important; }
-        .text-gray-800 { color: #1f2937 !important; }
-        .text-gray-700 { color: #374151 !important; }
-        .text-gray-600 { color: #4b5563 !important; }
-        .bg-blue-100 { background-color: #dbeafe !important; }
-        .bg-gray-50 { background-color: #f9fafb !important; }
-        .text-4xl { font-size: 2.25rem !important; line-height: 2.5rem !important; }
-        .text-2xl { font-size: 1.5rem !important; line-height: 2rem !important; }
-        .text-xl { font-size: 1.25rem !important; line-height: 1.75rem !important; }
-        .font-bold { font-weight: 700 !important; }
-        .font-semibold { font-weight: 600 !important; }
-        .font-medium { font-weight: 500 !important; }
-        .mb-8 { margin-bottom: 32px !important; }
-        .mb-4 { margin-bottom: 16px !important; }
-        .mb-2 { margin-bottom: 8px !important; }
-        .p-8 { padding: 32px !important; }
-        .px-3 { padding-left: 12px !important; padding-right: 12px !important; }
-        .py-1 { padding-top: 4px !important; padding-bottom: 4px !important; }
-        .pl-6 { padding-left: 24px !important; }
-        .pb-2 { padding-bottom: 8px !important; }
-        .rounded-lg { border-radius: 8px !important; }
-        .rounded { border-radius: 4px !important; }
-    </style>
-</head>
-<body>
-    <div class="resume-container">
-        ${element.innerHTML}
-    </div>
-</body>
-</html>`;
+    const totalPages = Math.ceil(scaledCanvasHeight / pageHeight);
 
-      const blob = new Blob([htmlContent], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `resume-${Date.now()}.html`;
-      link.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("خطا در export HTML:", error);
-      throw error;
+    for (let page = 1; page < totalPages; page++) {
+      pdf.addPage();
+
+      const sourceY = (page * pageHeight) / scaleFactor;
+      const sourceHeight = Math.min(
+        pageHeight / scaleFactor,
+        canvasHeight - sourceY
+      );
+
+      // ایجاد canvas موقت برای این قسمت
+      const tempCanvas = document.createElement("canvas");
+      const tempCtx = tempCanvas.getContext("2d")!;
+
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = sourceHeight;
+
+      tempCtx.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        sourceHeight,
+        0,
+        0,
+        canvas.width,
+        sourceHeight
+      );
+
+      const tempImgData = tempCanvas.toDataURL("image/png", 1.0);
+
+      pdf.addImage(
+        tempImgData,
+        "PNG",
+        (pdfWidth - finalWidth) / 2,
+        5,
+        finalWidth,
+        sourceHeight * scaleFactor,
+        undefined,
+        "FAST"
+      );
     }
+  }
+
+  private static async preloadImage(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve();
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  private static async waitForRender(): Promise<void> {
+    // صبر برای render کامل DOM
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // صبر برای تمام تصاویر
+    const images = document.querySelectorAll("img");
+    await Promise.all(
+      Array.from(images).map((img) => {
+        if (img.complete) return Promise.resolve();
+        return new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      })
+    );
   }
 }
