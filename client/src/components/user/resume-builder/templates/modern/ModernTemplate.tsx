@@ -245,33 +245,47 @@ export const ModernTemplate: React.FC<ModernTemplateProps> = ({
       </div>
 
       {/* Print Styles */}
-      <style jsx>{`
-        @media print {
-          .modern-template {
-            font-size: 12px;
-          }
+      <style jsx global>{`
+        .modern-template {
+          font-family: "Inter", "Segoe UI", sans-serif !important;
+          background-color: #ffffff !important;
+        }
 
-          header {
-            background: #2563eb !important;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-          }
+        .modern-template header {
+          background: linear-gradient(to right, #2563eb, #1d4ed8) !important;
+          color: #ffffff !important;
+        }
 
-          .border-blue-600 {
-            border-color: #2563eb !important;
-          }
+        .modern-template .border-blue-600 {
+          border-color: #2563eb !important;
+        }
 
-          .text-blue-600 {
-            color: #2563eb !important;
-          }
+        .modern-template .text-blue-600 {
+          color: #2563eb !important;
+        }
 
-          .bg-blue-100 {
-            background-color: #dbeafe !important;
-          }
+        .modern-template .bg-blue-100 {
+          background-color: #dbeafe !important;
+        }
 
-          .text-blue-800 {
-            color: #1e40af !important;
-          }
+        .modern-template .text-blue-800 {
+          color: #1e40af !important;
+        }
+
+        .modern-template .bg-gray-50 {
+          background-color: #f9fafb !important;
+        }
+
+        .modern-template .text-gray-800 {
+          color: #1f2937 !important;
+        }
+
+        .modern-template .text-gray-700 {
+          color: #374151 !important;
+        }
+
+        .modern-template .text-gray-600 {
+          color: #4b5563 !important;
         }
       `}</style>
     </div>
