@@ -1,305 +1,254 @@
-import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import type { Resume, Template } from "@/types/resume";
+import jsPDF from "jspdf";
 
 export class ResumeExporter {
-  private resume: Resume;
-  private template: Template;
-  private customization?: any;
+  private static readonly PDF_CONFIG = {
+    format: "a4" as const,
+    orientation: "portrait" as const,
+    unit: "mm" as const,
+    hotfixes: ["px_scaling"],
+    compress: true,
+  };
 
-  constructor(resume: Resume, template: Template, customization?: any) {
-    this.resume = resume;
-    this.template = template;
-    this.customization = customization;
-  }
+  private static readonly CANVAS_CONFIG = {
+    scale: 3, // بالاتر برای کیفیت بهتر
+    useCORS: true,
+    allowTaint: false,
+    backgroundColor: "#ffffff",
+    removeContainer: true,
+    imageTimeout: 30000,
+    logging: false,
+    width: 794, // A4 width در px با scale 1
+    height: 1123, // A4 height در px با scale 1
+  };
 
-  async exportToPDF(): Promise<Blob> {
+  static async exportToPDF(): Promise<void> {
     try {
-      const previewElement = document.getElementById("resume-preview");
+      console.log("شروع export به PDF...");
 
-      if (!previewElement) {
-        throw new Error("Preview element not found");
+      // پیدا کردن element
+      const element = document.getElementById("resume-preview");
+      if (!element) {
+        throw new Error("عنصر resume-preview یافت نشد");
       }
 
-      // تنظیمات خیلی محافظه‌کارانه
-      const canvas = await html2canvas(previewElement, {
-        scale: 1.5, // کمتر کردیم
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: "#ffffff",
-        logging: false,
-        foreignObjectRendering: false,
-        // فقط محتوای ساده
-        onclone: (clonedDoc) => {
-          // تمام gradient ها و CSS مدرن رو حذف کن
-          const allElements = clonedDoc.getElementsByTagName("*");
-          for (let element of Array.from(allElements)) {
-            if (element instanceof HTMLElement) {
-              const style = element.style;
+      // اعمال استایل‌های مخصوص PDF
+      await this.applyPdfStyles(element);
 
-              // هر چیزی که oklch داره رو پاک کن
-              for (let prop of Array.from(style)) {
-                if (style.getPropertyValue(prop).includes("oklch")) {
-                  style.removeProperty(prop);
-                }
-              }
+      // تولید canvas
+      const canvas = await html2canvas(element, this.CANVAS_CONFIG);
 
-              // رنگ‌های ساده بذار
-              if (element.classList.contains("bg-gradient-to-r")) {
-                element.style.background = "#8b5cf6";
-              }
-            }
-          }
-        },
-      });
+      // برگرداندن استایل‌های اصلی
+      await this.revertStyles(element);
 
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
+      // محاسبه ابعاد
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF(this.PDF_CONFIG);
 
-      const imgData = canvas.toDataURL("image/png");
-      pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      return pdf.output("blob");
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      throw new Error(`PDF Export Error: ${error}`);
-    }
-  }
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
 
-  // المنت کلون شده با استایل‌های ساده
-  private createCleanElement(element: HTMLElement): HTMLElement {
-    const cloned = element.cloneNode(true) as HTMLElement;
+      // نسبت‌های صحیح
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
 
-    // استایل‌های inline مشکل‌دار رو پاک کن
-    this.cleanModernCSS(cloned);
-
-    // استایل‌های ساده اضافه کن
-    cloned.style.cssText = `
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      width: 794px;
-      min-height: 1123px;
-      background: white;
-      font-family: Arial, sans-serif;
-      color: #333;
-      padding: 0;
-      margin: 0;
-    `;
-
-    return cloned;
-  }
-
-  private cleanModernCSS(element: HTMLElement): void {
-    // تمام المنت‌ها و فرزندانشون رو پاک کن
-    const walkElements = (el: HTMLElement) => {
-      // استایل‌های مشکل‌دار رو حذف کن
-      const style = el.style;
-
-      // oklch, hsl(), rgb() مدرن و ... رو با رنگ‌های ساده جایگزین کن
-      if (
-        style.backgroundColor &&
-        (style.backgroundColor.includes("oklch") ||
-          style.backgroundColor.includes("hsl") ||
-          style.backgroundColor.includes("rgb"))
-      ) {
-        if (
-          style.backgroundColor.includes("purple") ||
-          style.backgroundColor.includes("violet")
-        ) {
-          style.backgroundColor = "#8b5cf6";
-        } else if (style.backgroundColor.includes("blue")) {
-          style.backgroundColor = "#3b82f6";
-        } else if (
-          style.backgroundColor.includes("gray") ||
-          style.backgroundColor.includes("slate")
-        ) {
-          style.backgroundColor = "#6b7280";
-        } else {
-          style.backgroundColor = "#ffffff";
-        }
-      }
-
-      if (
-        style.color &&
-        (style.color.includes("oklch") ||
-          style.color.includes("hsl") ||
-          style.color.includes("rgb"))
-      ) {
-        style.color = "#333333";
-      }
-
-      // gradient ها رو ساده کن
-      if (style.background && style.background.includes("gradient")) {
-        if (style.background.includes("purple")) {
-          style.background = "#8b5cf6";
-        } else if (style.background.includes("blue")) {
-          style.background = "#3b82f6";
-        } else {
-          style.background = "#ffffff";
-        }
-      }
-
-      // backdrop-filter رو حذف کن
-      if (style.backdropFilter) {
-        style.backdropFilter = "none";
-      }
-
-      // CSS custom properties رو حذف کن
-      Array.from(style).forEach((prop) => {
-        if (prop.startsWith("--")) {
-          style.removeProperty(prop);
-        }
-      });
-
-      // فرزندان رو هم پردازش کن
-      Array.from(el.children).forEach((child) => {
-        if (child instanceof HTMLElement) {
-          walkElements(child);
-        }
-      });
-    };
-
-    walkElements(element);
-  }
-
-  async exportToHTML(): Promise<string> {
-    try {
-      const previewElement = document.getElementById("resume-preview");
-
-      if (!previewElement) {
-        throw new Error("Preview element not found");
-      }
-
-      const resumeElement =
-        previewElement.querySelector(".resume-template") ||
-        previewElement.querySelector(".creative-template") ||
-        previewElement.querySelector("[data-template-id]") ||
-        previewElement;
-
-      if (!resumeElement) {
-        throw new Error("Resume template element not found");
-      }
-
-      // المنت کلین شده
-      const cleanElement = this.createCleanElement(
-        resumeElement as HTMLElement
+      pdf.addImage(
+        imgData,
+        "PNG",
+        imgX,
+        imgY,
+        imgWidth * ratio,
+        imgHeight * ratio,
+        undefined,
+        "FAST"
       );
 
-      const html = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${this.resume.personalInfo?.firstName || "Resume"} ${
-        this.resume.personalInfo?.lastName || ""
-      }</title>
-          <style>
-            ${this.getBaseCSS()}
-          </style>
-        </head>
-        <body>
-          <div class="resume-container">
-            ${cleanElement.outerHTML}
-          </div>
-        </body>
-        </html>
-      `;
+      // دانلود
+      const fileName = `resume-${Date.now()}.pdf`;
+      pdf.save(fileName);
 
-      return html;
+      console.log("PDF با موفقیت تولید شد");
     } catch (error) {
-      console.error("HTML export failed:", error);
-      throw new Error("Failed to export HTML");
+      console.error("خطا در تولید PDF:", error);
+      throw error;
     }
   }
 
-  async exportToJSON(): Promise<string> {
+  private static async applyPdfStyles(element: HTMLElement): Promise<void> {
+    // ذخیره استایل‌های فعلی
+    element.setAttribute(
+      "data-original-style",
+      element.getAttribute("style") || ""
+    );
+
+    // اعمال استایل‌های PDF
+    const pdfStyles = `
+      position: relative !important;
+      transform: none !important;
+      width: 794px !important;
+      min-height: 1123px !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 20px !important;
+      background: #ffffff !important;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #000000 !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      backdrop-filter: none !important;
+      overflow: visible !important;
+    `;
+
+    element.setAttribute("style", pdfStyles);
+
+    // اصلاح تمام child elements
+    this.fixChildElements(element);
+
+    // صبر برای اعمال تغییرات
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  private static fixChildElements(parent: HTMLElement): void {
+    const allElements = parent.querySelectorAll("*");
+
+    allElements.forEach((el: Element) => {
+      const htmlEl = el as HTMLElement;
+
+      // ذخیره استایل اصلی
+      htmlEl.setAttribute(
+        "data-original-style",
+        htmlEl.getAttribute("style") || ""
+      );
+
+      const computedStyle = window.getComputedStyle(htmlEl);
+      const currentStyle = htmlEl.getAttribute("style") || "";
+
+      let newStyles = currentStyle;
+
+      // اصلاح رنگ‌ها
+      if (computedStyle.color.includes("rgb")) {
+        newStyles += `; color: ${this.convertColorToPrint(
+          computedStyle.color
+        )} !important`;
+      }
+
+      if (computedStyle.backgroundColor.includes("rgb")) {
+        newStyles += `; background-color: ${this.convertColorToPrint(
+          computedStyle.backgroundColor
+        )} !important`;
+      }
+
+      // اصلاح borders
+      if (computedStyle.borderColor.includes("rgb")) {
+        newStyles += `; border-color: ${this.convertColorToPrint(
+          computedStyle.borderColor
+        )} !important`;
+      }
+
+      // حذف backdrop filters و effects
+      newStyles += `; backdrop-filter: none !important; filter: none !important;`;
+
+      // اصلاح font
+      newStyles += `; font-family: 'Inter', 'Segoe UI', sans-serif !important;`;
+
+      // اصلاح positioning
+      if (
+        computedStyle.position === "fixed" ||
+        computedStyle.position === "sticky"
+      ) {
+        newStyles += `; position: relative !important;`;
+      }
+
+      htmlEl.setAttribute("style", newStyles);
+    });
+  }
+
+  private static convertColorToPrint(color: string): string {
+    // تبدیل رنگ‌های شفاف به رنگ‌های solid
+    if (color.includes("rgba")) {
+      const rgba = color.match(/rgba?\(([^)]+)\)/)?.[1].split(",");
+      if (rgba && rgba.length >= 3) {
+        return `rgb(${rgba[0].trim()}, ${rgba[1].trim()}, ${rgba[2].trim()})`;
+      }
+    }
+    return color;
+  }
+
+  private static async revertStyles(element: HTMLElement): Promise<void> {
+    // برگرداندن استایل اصلی
+    const originalStyle = element.getAttribute("data-original-style");
+    if (originalStyle) {
+      element.setAttribute("style", originalStyle);
+    } else {
+      element.removeAttribute("style");
+    }
+    element.removeAttribute("data-original-style");
+
+    // برگرداندن استایل‌های child elements
+    const allElements = element.querySelectorAll("*");
+    allElements.forEach((el: Element) => {
+      const htmlEl = el as HTMLElement;
+      const originalStyle = htmlEl.getAttribute("data-original-style");
+      if (originalStyle) {
+        htmlEl.setAttribute("style", originalStyle);
+      } else {
+        htmlEl.removeAttribute("style");
+      }
+      htmlEl.removeAttribute("data-original-style");
+    });
+  }
+
+  static async exportToHTML(): Promise<void> {
     try {
-      const exportData = {
-        resume: this.resume,
-        template: this.template,
-        customization: this.customization,
-        exportDate: new Date().toISOString(),
-        version: "1.0",
-      };
-
-      return JSON.stringify(exportData, null, 2);
-    } catch (error) {
-      console.error("JSON export failed:", error);
-      throw new Error("Failed to export JSON");
-    }
-  }
-
-  private getBaseCSS(): string {
-    return `
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        background: #f5f5f5;
-        padding: 20px;
-      }
-      
-      .resume-container {
-        max-width: 210mm;
-        margin: 0 auto;
-        background: white;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      const element = document.getElementById("resume-preview");
+      if (!element) {
+        throw new Error("عنصر resume-preview یافت نشد");
       }
 
-      /* رنگ‌های ساده برای جایگزینی */
-      .bg-purple-600 { background-color: #8b5cf6 !important; }
-      .bg-blue-600 { background-color: #3b82f6 !important; }
-      .text-purple-600 { color: #8b5cf6 !important; }
-      .text-blue-600 { color: #3b82f6 !important; }
-      .text-gray-800 { color: #1f2937 !important; }
-      .text-gray-700 { color: #374151 !important; }
-      .text-gray-600 { color: #4b5563 !important; }
-      .text-gray-500 { color: #6b7280 !important; }
-      
-      @media print {
+      const htmlContent = `
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <style>
         body { 
-          margin: 0; 
-          padding: 0;
-          background: white;
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f5f5; 
         }
         .resume-container { 
-          box-shadow: none; 
-          margin: 0;
-          max-width: none;
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); 
         }
-      }
-      
-      @page {
-        size: A4;
-        margin: 0;
-      }
-    `;
+    </style>
+</head>
+<body>
+    <div class="resume-container">
+        ${element.innerHTML}
+    </div>
+</body>
+</html>`;
+
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `resume-${Date.now()}.html`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("خطا در export HTML:", error);
+      throw error;
+    }
   }
 }
-
-// Helper function
-export const downloadFile = (
-  blob: Blob,
-  filename: string,
-  mimeType: string
-) => {
-  const url = URL.createObjectURL(new Blob([blob], { type: mimeType }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-};

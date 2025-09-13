@@ -15,24 +15,57 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
   className = "",
 }) => {
   const { currentResume } = useAppStore();
-
-  // Use props resume if provided, otherwise use currentResume
   const resumeData = resume || currentResume;
 
   return (
     <div
-      className={`resume-template bg-white text-black p-8 min-h-[297mm] w-[210mm] mx-auto shadow-lg ${className}`}
-      data-template-id={template?.id}>
+      className={`resume-template ${className}`}
+      data-template-id={template?.id}
+      style={{
+        backgroundColor: "#ffffff",
+        color: "#000000",
+        padding: "32px",
+        minHeight: "297mm",
+        width: "210mm",
+        maxWidth: "210mm",
+        margin: "0 auto",
+        fontFamily: '"Inter", "Segoe UI", sans-serif',
+        fontSize: "14px",
+        lineHeight: "1.6",
+        boxShadow: isPreview ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "none",
+      }}>
       {/* Header */}
-      <div className="border-b-4 border-purple-600 pb-6 mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">
+      <div
+        style={{
+          borderBottom: "4px solid #8b5cf6",
+          paddingBottom: "24px",
+          marginBottom: "32px",
+        }}>
+        <h1
+          style={{
+            fontSize: "36px",
+            fontWeight: "bold",
+            color: "#1f2937",
+            margin: "0 0 8px 0",
+          }}>
           {resumeData.personalInfo?.firstName}{" "}
           {resumeData.personalInfo?.lastName}
         </h1>
-        <p className="text-xl text-purple-600 mb-4">
+        <p
+          style={{
+            fontSize: "20px",
+            color: "#8b5cf6",
+            margin: "0 0 16px 0",
+          }}>
           {resumeData.personalInfo?.title || "Professional"}
         </p>
-        <div className="flex flex-wrap gap-4 text-gray-600">
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
+            color: "#6b7280",
+          }}>
           {resumeData.personalInfo?.email && (
             <span>📧 {resumeData.personalInfo.email}</span>
           )}
@@ -47,11 +80,24 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
 
       {/* Summary */}
       {resumeData.personalInfo?.summary && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-purple-600 pl-3">
+        <div style={{ marginBottom: "32px" }}>
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#1f2937",
+              margin: "0 0 16px 0",
+              borderLeft: "4px solid #8b5cf6",
+              paddingLeft: "12px",
+            }}>
             About Me
           </h2>
-          <p className="text-gray-700 leading-relaxed">
+          <p
+            style={{
+              color: "#374151",
+              lineHeight: "1.7",
+              margin: "0",
+            }}>
             {resumeData.personalInfo.summary}
           </p>
         </div>
@@ -59,36 +105,98 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
 
       {/* Experience */}
       {resumeData.experiences?.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-purple-600 pl-3">
+        <div style={{ marginBottom: "32px" }}>
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#1f2937",
+              margin: "0 0 24px 0",
+              borderLeft: "4px solid #8b5cf6",
+              paddingLeft: "12px",
+            }}>
             Experience
           </h2>
           {resumeData.experiences.map((exp: any, index: number) => (
-            <div key={index} className="mb-6 border-l-2 border-purple-200 pl-6">
-              <div className="flex justify-between items-start mb-2">
+            <div
+              key={index}
+              style={{
+                marginBottom: "24px",
+                borderLeft: "2px solid #e5e7eb",
+                paddingLeft: "24px",
+              }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "8px",
+                }}>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800">
+                  <h3
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "600",
+                      color: "#1f2937",
+                      margin: "0 0 4px 0",
+                    }}>
                     {exp.position}
                   </h3>
-                  <p className="text-purple-600 font-medium">{exp.company}</p>
+                  <p
+                    style={{
+                      color: "#8b5cf6",
+                      fontWeight: "500",
+                      margin: "0 0 4px 0",
+                    }}>
+                    {exp.company}
+                  </p>
                   {exp.location && (
-                    <p className="text-gray-500 text-sm">{exp.location}</p>
+                    <p
+                      style={{
+                        color: "#6b7280",
+                        fontSize: "14px",
+                        margin: "0",
+                      }}>
+                      {exp.location}
+                    </p>
                   )}
                 </div>
-                <div className="text-right text-gray-500">
-                  <p className="font-medium">
+                <div
+                  style={{
+                    textAlign: "right",
+                    color: "#6b7280",
+                  }}>
+                  <p
+                    style={{
+                      fontWeight: "500",
+                      margin: "0",
+                    }}>
                     {exp.startDate} -{" "}
                     {exp.isCurrentJob ? "Present" : exp.endDate}
                   </p>
                 </div>
               </div>
               {exp.description && (
-                <p className="text-gray-700 mb-3">{exp.description}</p>
+                <p
+                  style={{
+                    color: "#374151",
+                    margin: "0 0 12px 0",
+                  }}>
+                  {exp.description}
+                </p>
               )}
               {exp.achievements?.length > 0 && (
-                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                <ul
+                  style={{
+                    listStyle: "disc",
+                    paddingLeft: "20px",
+                    margin: "0",
+                    color: "#374151",
+                  }}>
                   {exp.achievements.map((achievement: string, i: number) => (
-                    <li key={i}>{achievement}</li>
+                    <li key={i} style={{ marginBottom: "4px" }}>
+                      {achievement}
+                    </li>
                   ))}
                 </ul>
               )}
@@ -99,20 +207,45 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
 
       {/* Skills */}
       {resumeData.skills?.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-purple-600 pl-3">
+        <div style={{ marginBottom: "32px" }}>
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#1f2937",
+              margin: "0 0 16px 0",
+              borderLeft: "4px solid #8b5cf6",
+              paddingLeft: "12px",
+            }}>
             Skills
           </h2>
           {resumeData.skills.map((skill: any, index: number) => (
-            <div key={index} className="mb-4">
-              <h3 className="font-semibold text-gray-800 mb-2">
+            <div key={index} style={{ marginBottom: "16px" }}>
+              <h3
+                style={{
+                  fontWeight: "600",
+                  color: "#1f2937",
+                  margin: "0 0 8px 0",
+                }}>
                 {skill.category}
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                }}>
                 {skill.items?.map((item: string, i: number) => (
                   <span
                     key={i}
-                    className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                    style={{
+                      backgroundColor: "#f3e8ff",
+                      color: "#7c3aed",
+                      padding: "4px 12px",
+                      borderRadius: "9999px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                    }}>
                     {item}
                   </span>
                 ))}
@@ -124,22 +257,52 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
 
       {/* Education */}
       {resumeData.educations?.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-purple-600 pl-3">
+        <div style={{ marginBottom: "32px" }}>
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#1f2937",
+              margin: "0 0 16px 0",
+              borderLeft: "4px solid #8b5cf6",
+              paddingLeft: "12px",
+            }}>
             Education
           </h2>
           {resumeData.educations.map((edu: any, index: number) => (
-            <div key={index} className="mb-4">
-              <div className="flex justify-between items-start">
+            <div key={index} style={{ marginBottom: "16px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}>
                 <div>
-                  <h3 className="font-semibold text-gray-800">{edu.degree}</h3>
-                  <p className="text-purple-600">{edu.institution}</p>
+                  <h3
+                    style={{
+                      fontWeight: "600",
+                      color: "#1f2937",
+                      margin: "0 0 4px 0",
+                    }}>
+                    {edu.degree}
+                  </h3>
+                  <p
+                    style={{
+                      color: "#8b5cf6",
+                      margin: "0",
+                    }}>
+                    {edu.institution}
+                  </p>
                 </div>
-                <div className="text-right text-gray-500">
-                  <p>
+                <div
+                  style={{
+                    textAlign: "right",
+                    color: "#6b7280",
+                  }}>
+                  <p style={{ margin: "0 0 4px 0" }}>
                     {edu.startDate} - {edu.endDate}
                   </p>
-                  {edu.gpa && <p>GPA: {edu.gpa}</p>}
+                  {edu.gpa && <p style={{ margin: "0" }}>GPA: {edu.gpa}</p>}
                 </div>
               </div>
             </div>
@@ -149,32 +312,80 @@ export const BaseTemplate: React.FC<BaseTemplateProps> = ({
 
       {/* Achievements */}
       {resumeData.achievements?.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-purple-600 pl-3">
+        <div>
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#1f2937",
+              margin: "0 0 16px 0",
+              borderLeft: "4px solid #8b5cf6",
+              paddingLeft: "12px",
+            }}>
             Achievements
           </h2>
           {resumeData.achievements.map((achievement: any, index: number) => (
-            <div key={index} className="mb-4 bg-purple-50 p-4 rounded-lg">
-              <div className="flex justify-between items-start">
+            <div
+              key={index}
+              style={{
+                marginBottom: "16px",
+                backgroundColor: "#f8fafc",
+                padding: "16px",
+                borderRadius: "8px",
+                border: "1px solid #e2e8f0",
+              }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}>
                 <div>
-                  <h3 className="font-semibold text-gray-800">
+                  <h3
+                    style={{
+                      fontWeight: "600",
+                      color: "#1f2937",
+                      margin: "0 0 4px 0",
+                    }}>
                     {achievement.title}
                   </h3>
-                  <p className="text-purple-600">{achievement.category}</p>
+                  <p
+                    style={{
+                      color: "#8b5cf6",
+                      margin: "0 0 4px 0",
+                    }}>
+                    {achievement.category}
+                  </p>
                   {achievement.issuer && (
-                    <p className="text-gray-600 text-sm">
+                    <p
+                      style={{
+                        color: "#6b7280",
+                        fontSize: "14px",
+                        margin: "0",
+                      }}>
                       {achievement.issuer}
                     </p>
                   )}
                 </div>
                 {achievement.date && (
-                  <span className="text-gray-500 text-sm">
+                  <span
+                    style={{
+                      color: "#6b7280",
+                      fontSize: "14px",
+                    }}>
                     {achievement.date}
                   </span>
                 )}
               </div>
               {achievement.description && (
-                <p className="text-gray-700 mt-2">{achievement.description}</p>
+                <p
+                  style={{
+                    color: "#374151",
+                    marginTop: "8px",
+                    margin: "8px 0 0 0",
+                  }}>
+                  {achievement.description}
+                </p>
               )}
             </div>
           ))}
