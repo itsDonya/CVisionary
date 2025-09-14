@@ -6,8 +6,10 @@ import AboutUs from "@/features/about/pages/About";
 
 // layouts
 import DefaultLayout from "@/shared/layouts/Default";
+import AuthLayout from "@/features/auth/layouts/Auth";
 
 export const router = createBrowserRouter([
+  // general
   {
     path: "/",
     element: <DefaultLayout />,
@@ -17,9 +19,14 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/about-us",
+        path: "about-us",
         element: <AboutUs />,
       },
     ],
+  },
+  // auth
+  {
+    path: "/auth",
+    element: <AuthLayout />,
   },
 ]);
