@@ -1,12 +1,11 @@
 /* DEFAULT CLASSES */
 .btn {
-  @apply px-5 py-3 flex items-center justify-center gap-2 cursor-pointer;
+  @apply flex items-center justify-center gap-2 cursor-pointer;
 }
 
 /* SUPER BUTTON */
 .super-button {
   border: none;
-  font-size: 1rem;
   cursor: pointer;
   position: relative;
   background: linear-gradient(90deg, #d81bb9, #1762d4);

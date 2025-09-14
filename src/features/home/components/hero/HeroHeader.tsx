@@ -1,6 +1,6 @@
 // navbar links
 import { Link } from "react-router-dom";
-import { User, UserCircle } from "lucide-react";
+import { User } from "lucide-react";
 
 import Logo from "@/shared/components/UI/Logo";
 import Button from "@/shared/components/UI/Button";
@@ -33,10 +33,11 @@ const HeroHeader = () => {
           ))}
         </nav>
 
-        {/* profile */}
-        {/* <UserCircle className="text-white/60 cursor-pointer" /> */}
-
-        <Button variant="icon"></Button>
+        {/* panel */}
+        {/* <Button variant="icon"></Button> */}
+        <Button size="sm" icon={<User className="size-4 text-white/60" />}>
+          Login
+        </Button>
       </div>
     </header>
   );
