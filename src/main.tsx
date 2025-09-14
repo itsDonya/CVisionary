@@ -11,12 +11,9 @@ import "@/assets/style/main.css";
 // router
 import { router } from "./router";
 
-// theme
-import { theme } from "./theme/theme";
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={{}}>
       <RouterProvider router={router} />
     </ThemeProvider>
   </StrictMode>
