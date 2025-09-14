@@ -4,7 +4,7 @@ import HeroNavigation from "./HeroHeader";
 const Hero = () => {
   return (
     <section className="w-full h-screen min-h-screen flex flex-center">
-      <div className="w-11/12 h-[88%] px-8 py-6 bg-gradient-to-br from-black/20 to-black/40 flex flex-col items-start justify-start gap-6 border border-white/20 rounded-3xl backdrop-blur-3xl shadow-2xl">
+      <div className="w-11/12 min-h-max h-[88%] px-8 py-6 bg-gradient-to-br from-black/20 to-black/40 flex flex-col items-start justify-start gap-6 border border-white/20 rounded-3xl backdrop-blur-3xl shadow-2xl">
         <HeroNavigation />
         <HeroContent />
       </div>

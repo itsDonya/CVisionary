@@ -33,9 +33,11 @@ const HeroHeader = () => {
           ))}
         </nav>
 
-        {/* panel */}
-        {/* <Button variant="icon"></Button> */}
-        <Button size="sm" icon={<User className="size-4 text-white/60" />}>
+        {/* login/panel */}
+        <Button
+          to="/auth/login"
+          size="sm"
+          icon={<User className="size-4 text-white/60" />}>
           Login
         </Button>
       </div>
