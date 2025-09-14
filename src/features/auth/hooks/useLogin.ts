@@ -44,11 +44,6 @@ export const useLogin = () => {
           setIsLoading(false);
           break;
 
-        case "user_already_exists":
-          setError("Email in already existed, Log in to you account.");
-          setIsLoading(false);
-          break;
-
         default:
           setError(err.message || "An error occurred during login");
           setIsLoading(false);
