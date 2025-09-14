@@ -3,9 +3,18 @@ import { createBrowserRouter } from "react-router-dom";
 // pages
 import Home from "@/features/home/pages/Home";
 
+// layouts
+import DefaultLayout from "@/shared/layouts/Default";
+
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <DefaultLayout />,
+    children: [
+      {
+        path: "",
+        element: <Home />,
+      },
+    ],
   },
 ]);
