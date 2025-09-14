@@ -1,11 +1,12 @@
 // navbar links
-import { navlinks } from "../../data";
 import { Link } from "react-router-dom";
+import { User, UserCircle } from "lucide-react";
 
-// types
-import type { Navlink } from "../../types";
-import { UserCircle } from "lucide-react";
 import Logo from "@/shared/components/UI/Logo";
+import Button from "@/shared/components/UI/Button";
+
+import { navlinks } from "../../data";
+import type { Navlink } from "../../types";
 
 const HeroHeader = () => {
   return (
@@ -33,7 +34,9 @@ const HeroHeader = () => {
         </nav>
 
         {/* profile */}
-        <UserCircle className="text-white/60 cursor-pointer" />
+        {/* <UserCircle className="text-white/60 cursor-pointer" /> */}
+
+        <Button variant="icon"></Button>
       </div>
     </header>
   );

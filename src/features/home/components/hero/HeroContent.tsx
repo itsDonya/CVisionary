@@ -1,8 +1,8 @@
-import Button from "@/shared/components/UI/Button";
-import { heroSection } from "../../data";
+import { Sparkles, Zap } from "lucide-react";
 import HeroProperties from "./HeroProperties";
 import HeroScrollWheel from "./HeroScrollWheel";
-import { Zap } from "lucide-react";
+import Button from "@/shared/components/UI/Button";
+import { heroSection } from "../../data";
 
 const HeroContent = () => {
   return (
@@ -20,7 +20,9 @@ const HeroContent = () => {
         {heroSection.description}
       </p>
 
-      <Button>{heroSection.buttonText}</Button>
+      <Button variant="super" icon={<Sparkles className="size-4" />}>
+        {heroSection.buttonText}
+      </Button>
 
       <span className="w-64 h-0.5 mt-6 bg-gradient-to-r from-white/5 via-white/20 to-white/5 rounded-[50%]"></span>
 

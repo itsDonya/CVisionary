@@ -1,24 +1,22 @@
-/* From Uiverse.io by Spacious74 */
-.button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* DEFAULT CLASSES */
+.btn {
+  @apply px-5 py-3 flex items-center justify-center gap-2 cursor-pointer;
 }
-.button {
-  padding: 12px 20px;
+
+/* SUPER BUTTON */
+.super-button {
   border: none;
   font-size: 1rem;
   cursor: pointer;
   position: relative;
   background: linear-gradient(90deg, #d81bb9, #1762d4);
-  border-radius: 12px;
   color: #fff;
   transition: all 0.3s ease;
   box-shadow: inset 0px 0px 5px #ffffffa9, inset 0px 25px 40px #25011f,
     0px 5px 10px #00000040;
   text-shadow: 1px 1px 1px #000;
 }
-.button::before {
+.super-button::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -30,14 +28,14 @@
   background: conic-gradient(#40baf7, #f34ad7, #5bfcc4);
   transition: all 0.3s ease;
 }
-.button:hover::before {
+.super-button:hover::before {
   filter: blur(5px);
 }
-.button:active::before {
+.super-button:active::before {
   filter: blur(5px);
   transform: translateY(1px);
 }
-.button:active {
+.super-button:active {
   box-shadow: inset 0px 0px 5px #ffffffa9, inset 0px 35px 30px #000;
   margin-top: 3px;
 }
