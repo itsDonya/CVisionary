@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/shared/lib/supabaseClient.ts";
+import { useNavigate } from "react-router-dom";
+
 import { loginSchema } from "../schema/login.scheme";
 import type { LoginFormType } from "../types/login.type";
 
+import { supabase } from "@/shared/lib/supabaseClient.ts";
+import { useNotifications } from "@/shared/components/notifications/useNotification";
+
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const { showSuccess, showError } = useNotifications();
+
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
@@ -20,7 +27,6 @@ export const useLogin = () => {
 
   const onSubmit = async (data: LoginFormType) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const { data: authData, error: authError } =
@@ -36,20 +42,25 @@ export const useLogin = () => {
       // TODO: remove
       console.log("Login successful:", authData);
 
-      window.location.href = "/panel";
+      showSuccess("Logged in successfully");
+
+      setTimeout(() => {
+        // TODO: navigate to user panel
+        navigate("/");
+      }, 1000);
     } catch (err: any) {
       switch (err.code) {
         case "invalid_credentials":
-          setError("Email or password is wrong, try again");
+          showError("Email or password is wrong, try again");
           break;
 
         default:
-          setError(err.message || "An error occurred during login");
+          showError(err.message || "An error occurred during login");
           break;
       }
       setIsLoading(false);
     }
   };
 
-  return { form, onSubmit, isLoading, error };
+  return { form, onSubmit, isLoading };
 };

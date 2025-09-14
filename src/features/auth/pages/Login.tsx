@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 
 const Login = () => {
-  const { form, onSubmit, isLoading, error } = useLogin();
+  const { form, onSubmit, isLoading } = useLogin();
   const {
     register,
     handleSubmit,
@@ -14,8 +14,6 @@ const Login = () => {
       <h1 className="text-white text-3xl font-medium text-center mb-8">
         Login
       </h1>
-
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
