@@ -188,7 +188,8 @@ const ResumeBuilder = () => {
         {/* Main Content */}
         <div
           className={`transition-all duration-300 ${
-            showPreview ? "w-1/2" : "w-full"
+            // showPreview ? "w-1/2" : "w-full"
+            "w-full"
           }`}>
           <div className="max-w-4xlss wf-ull mx-auto px-4 py-6 space-y-6">
             {/* Header */}
@@ -409,13 +410,13 @@ const ResumeBuilder = () => {
         </div>
 
         {/* Preview Panel */}
-        {showPreview && (
+        {/* {showPreview && (
           <div className="w-1/2 border-l border-slate-700/50">
             <div className="sticky top-0 h-screen overflow-auto">
               <PreviewPanel className="h-full" />
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Template Customizer Dialog */}
