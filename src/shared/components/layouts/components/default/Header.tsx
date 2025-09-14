@@ -2,6 +2,8 @@ import { header } from "../../data/default";
 import { Link } from "react-router-dom";
 import type { HeaderLinkItem } from "../../types/default";
 import Logo from "@/shared/components/UI/Logo";
+import Button from "@/shared/components/UI/Button";
+import { User } from "lucide-react";
 
 const Header = () => {
   return (
@@ -16,16 +18,26 @@ const Header = () => {
         <h1 className="text-white/70 text-xl font-[500]">CVisionary</h1>
       </Link>
 
-      <nav className="flex items-center justify-end gap-6">
-        {header.links.map((item: HeaderLinkItem) => (
-          <Link
-            to={item.path}
-            key={item.title}
-            className="text-sm text-neutral-400 hover:text-neutral-300 transition-colors duration-300 transition-200">
-            <span>{item.title}</span>
-          </Link>
-        ))}
-      </nav>
+      <div className="flex items-center justify-end gap-12">
+        <nav className="flex items-center justify-end gap-6">
+          {header.links.map((item: HeaderLinkItem) => (
+            <Link
+              to={item.path}
+              key={item.title}
+              className="text-sm text-neutral-400 hover:text-neutral-300 transition-colors duration-300 transition-200">
+              <span>{item.title}</span>
+            </Link>
+          ))}
+        </nav>
+
+        {/* login/panel */}
+        <Button
+          to="/auth/login"
+          size="sm"
+          icon={<User className="size-4 text-white/60" />}>
+          Login
+        </Button>
+      </div>
     </header>
   );
 };
