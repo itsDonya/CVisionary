@@ -1,4 +1,4 @@
-import type { PropertyItem } from "../../types/home.types";
+import type { PropertyItem } from "../../types";
 
 const PropertyCard = ({ icon: Icon, title, description }: PropertyItem) => {
   return (

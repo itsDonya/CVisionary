@@ -1,5 +1,5 @@
-import { featuresSection } from "../../data/home";
-import type { FeatureItem } from "../../types/home.types";
+import { featuresSection } from "../../data";
+import type { FeatureItem } from "../../types";
 
 const Features = () => {
   return (

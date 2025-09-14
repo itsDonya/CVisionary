@@ -1,4 +1,4 @@
-import * as homeTypes from "../types/home.types";
+import * as homeTypes from "../types";
 import {
   BrainCircuit,
   MonitorCheck,

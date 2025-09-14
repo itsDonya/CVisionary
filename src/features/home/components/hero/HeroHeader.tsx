@@ -1,9 +1,9 @@
 // navbar links
-import { navlinks } from "../../data/home";
+import { navlinks } from "../../data";
 import { Link } from "react-router-dom";
 
 // types
-import type { Navlink } from "../../types/home.types";
+import type { Navlink } from "../../types";
 import { UserCircle } from "lucide-react";
 import Logo from "@/shared/components/UI/Logo";
 

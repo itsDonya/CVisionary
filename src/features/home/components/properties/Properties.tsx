@@ -1,5 +1,5 @@
 import PropertyCard from "./PropertyCard";
-import { propertiesSection } from "../../data/home";
+import { propertiesSection } from "../../data";
 
 const Properties = () => {
   return (

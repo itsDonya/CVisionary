@@ -1,5 +1,5 @@
 import Button from "@/shared/components/UI/Button";
-import { heroSection } from "../../data/home";
+import { heroSection } from "../../data";
 import HeroProperties from "./HeroProperties";
 import HeroScrollWheel from "./HeroScrollWheel";
 import { Zap } from "lucide-react";

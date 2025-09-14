@@ -1,4 +1,4 @@
-import type { HeroPropertyItem } from "../../types/home.types";
+import type { HeroPropertyItem } from "../../types";
 
 const HeroProperties = ({ properties }: { properties: HeroPropertyItem[] }) => {
   return (
