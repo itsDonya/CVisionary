@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
 
 const Register = () => {
-  const { form, onSubmit, isLoading, error } = useRegister();
+  const { form, onSubmit, isLoading } = useRegister();
   const {
     register,
     handleSubmit,
@@ -14,8 +14,6 @@ const Register = () => {
       <h1 className="text-white text-3xl font-medium text-center mb-8">
         Register
       </h1>
-
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">

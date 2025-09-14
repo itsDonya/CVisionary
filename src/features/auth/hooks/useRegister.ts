@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/shared/lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
+
 import { registerSchema } from "../schema/register.schema";
 import type { RegisterFormType } from "../types/register.type";
 
+import { supabase } from "@/shared/lib/supabaseClient";
+import { useNotifications } from "@/shared/components/notifications/useNotification";
+
 export const useRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const { showSuccess, showError } = useNotifications();
+
+  const navigate = useNavigate();
 
   const form = useForm<RegisterFormType>({
     resolver: zodResolver(registerSchema),
@@ -21,7 +28,6 @@ export const useRegister = () => {
 
   const onSubmit = async (data: RegisterFormType) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -41,16 +47,20 @@ export const useRegister = () => {
       // TODO: remove
       console.log("Registration successful:", authData);
 
-      // TODO: navigate to user panel
-      window.location.href = "/";
+      showSuccess("Registered successfully");
+
+      setTimeout(() => {
+        // TODO: navigate to user panel
+        navigate("/");
+      }, 1000);
     } catch (err: any) {
       switch (err.code) {
         case "user_already_exists":
-          setError("Email is already existed, Log in to your account.");
+          showError("Email is already existed, Log in to your account.");
           break;
 
         default:
-          setError(err.message || "An error occurred during register");
+          showError(err.message || "An error occurred during register");
           break;
       }
 
@@ -58,5 +68,5 @@ export const useRegister = () => {
     }
   };
 
-  return { form, onSubmit, isLoading, error };
+  return { form, onSubmit, isLoading };
 };
