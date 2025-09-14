@@ -5,6 +5,7 @@ import Home from "@/features/home/pages/Home";
 import AboutUs from "@/features/about/pages/About";
 
 import Login from "@/features/auth/pages/Login";
+import Register from "@/features/auth/pages/Register";
 
 // layouts
 import DefaultLayout from "@/shared/layouts/Default";
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },

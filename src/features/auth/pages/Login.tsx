@@ -65,7 +65,7 @@ const Login = () => {
 
       <p className="text-center text-white/80 text-sm mt-6 flex flex-center gap-2">
         Don't have an account?
-        <Link to="/register" className="text-primary-500 hover:underline">
+        <Link to="/auth/register" className="text-primary-500 hover:underline">
           Register
         </Link>
       </p>
