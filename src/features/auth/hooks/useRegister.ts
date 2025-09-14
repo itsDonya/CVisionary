@@ -41,7 +41,7 @@ export const useRegister = () => {
       // TODO: remove
       console.log("Registration successful:", authData);
 
-      // window.location.href = "/panel";
+      // TODO: navigate to user panel
       window.location.href = "/";
     } catch (err: any) {
       switch (err.code) {
