@@ -1,29 +1,13 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useRegister } from "../hooks/useRegister";
 
 const Register = () => {
-  // states
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  // functions
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // TODO: handle register logic
-    console.log(formData);
-  };
+  const { form, onSubmit, isLoading, error } = useRegister();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
 
   return (
     <section className="w-full max-w-md bg-black/30 backdrop-blur-md rounded-lg border border-white/20 p-8 shadow-2xl">
@@ -31,63 +15,68 @@ const Register = () => {
         Register
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <input
             type="text"
-            name="name"
             placeholder="Enter your full name"
-            value={formData.name}
-            onChange={handleChange}
+            {...register("name")}
             className="w-full bg-transparent border-b-2 border-white/40 text-white placeholder-white/70 py-3 px-0 focus:outline-none focus:border-white/80 transition-colors duration-200"
-            required
           />
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <input
             type="email"
-            name="email"
             placeholder="Enter your email"
-            value={formData.email}
-            onChange={handleChange}
+            {...register("email")}
             className="w-full bg-transparent border-b-2 border-white/40 text-white placeholder-white/70 py-3 px-0 focus:outline-none focus:border-white/80 transition-colors duration-200"
-            required
           />
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <input
             type="password"
-            name="password"
             placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
+            {...register("password")}
             className="w-full bg-transparent border-b-2 border-white/40 text-white placeholder-white/70 py-3 px-0 focus:outline-none focus:border-white/80 transition-colors duration-200"
-            required
           />
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <input
             type="password"
-            name="confirmPassword"
             placeholder="Confirm your password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
+            {...register("confirmPassword")}
             className="w-full bg-transparent border-b-2 border-white/40 text-white placeholder-white/70 py-3 px-0 focus:outline-none focus:border-white/80 transition-colors duration-200"
-            required
           />
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm">
+              {errors.confirmPassword.message}
+            </p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="w-full bg-primary-500 text-white hover:text-primary-500 font-medium py-3 px-6 rounded-md hover:bg-white transition-300 mt-8 cursor-pointer">
-          Register
+          disabled={isLoading}
+          className="w-full bg-primary-500 text-white hover:text-primary-500 font-medium py-3 px-6 rounded-md hover:bg-white transition-300 mt-8 cursor-pointer disabled:opacity-50">
+          {isLoading ? "Registering..." : "Register"}
         </button>
       </form>
 
-      <p className="text-center text-white/80 text-sm mt-6 flex flex-cnter gap-2">
+      <p className="text-center text-white/80 text-sm mt-6 flex justify-center gap-2">
         Already have an account?
         <Link
           to="/auth/login"

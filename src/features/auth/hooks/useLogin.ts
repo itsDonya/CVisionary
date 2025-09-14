@@ -41,14 +41,13 @@ export const useLogin = () => {
       switch (err.code) {
         case "invalid_credentials":
           setError("Email or password is wrong, try again");
-          setIsLoading(false);
           break;
 
         default:
           setError(err.message || "An error occurred during login");
-          setIsLoading(false);
           break;
       }
+      setIsLoading(false);
     }
   };
 
