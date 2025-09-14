@@ -40,6 +40,7 @@ const Footer = () => {
         <div className="flex items-center justify-end gap-3">
           {footer.contactLinks.map((item: FooterContactItem) => (
             <a
+              key={item.href}
               href={item.href}
               target="_blank"
               className="size-10 bg-white/5 flex flex-center border border-white/20 rounded-xl shadow-lg hover:shadow-xl hover:shadow-black/60 cursor-pointer transition-200">

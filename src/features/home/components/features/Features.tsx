@@ -14,7 +14,9 @@ const Features = () => {
 
         <ul className="w-full grid grid-cols-3 gap-8">
           {featuresSection.items.map((feature: FeatureItem) => (
-            <li className="flex flex-col items-start justify-start gap-2">
+            <li
+              key={feature.title}
+              className="flex flex-col items-start justify-start gap-2">
               <div className="flex items-center justify-start gap-2">
                 <feature.icon className="size-4 text-white" />
 
